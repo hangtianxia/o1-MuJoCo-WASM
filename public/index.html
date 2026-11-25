@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>O1 · MuJoCo WASM preview</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0e13'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%2367d2c4'/%3E%3C/svg%3E" />
+<script>
+  (() => {
+    const root = document.documentElement;
+    const system = matchMedia('(prefers-color-scheme: light)');
+    let saved;
+    try { saved = localStorage.getItem('preview.theme'); } catch (_) {}
+    const apply = (theme) => {
+      root.dataset.theme = theme;
+      root.style.colorScheme = theme;
+      document.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+    };
+    window.__theme = {
+      get: () => root.dataset.theme,
+      set: (theme) => {
+        if (theme !== 'light' && theme !== 'dark') return;
+        saved = theme;
+        try { localStorage.setItem('preview.theme', theme); } catch (_) {}
+        apply(theme);
+      },
+      toggle: () => window.__theme.set(root.dataset.theme === 'dark' ? 'light' : 'dark'),
+    };
+    apply(saved === 'light' || saved === 'dark' ? saved : system.matches ? 'light' : 'dark');
+    system.addEventListener('change', () => {
+      if (saved !== 'light' && saved !== 'dark') apply(system.matches ? 'light' : 'dark');
+    });
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0e13;
+    --panel: #151c25;
+    --panel-border: rgba(156, 180, 204, 0.23);
+    --text: #dbe4ef;
+    --muted: #adbdce;
+    --accent: #67d2c4;
+    --accent-2: #f0b25a;
+    --danger: #ff7a7a;
+    --accent-glow: rgba(103, 210, 196, 0.8);
+    --danger-border: rgba(255, 122, 122, 0.4);
+    --danger-glow: rgba(255, 122, 122, 0.8);
+    --strong: #e2ecf7;
+    --secondary: #bccbdc;
+    --glass-top: rgba(20, 30, 42, 0.18);
+    --glass-bottom: rgba(8, 14, 22, 0.36);
+    --glass-edge: rgba(226, 240, 255, 0.18);
+    --glass-rim: rgba(255, 255, 255, 0.10);
+    --glass-highlight: rgba(255, 255, 255, 0.30);
+    --glass-contour: rgba(255, 255, 255, 0.05);
+    --glass-bevel: rgba(255, 255, 255, 0.09);
+    --glass-bevel-spread: rgba(255, 255, 255, 0.035);
+    --glass-topglow: rgba(255, 255, 255, 0.26);
+    --glass-sheen: rgba(255, 255, 255, 0.07);
+    --glass-wash: rgba(255, 255, 255, 0.05);
+    --glass-specular: rgba(255, 255, 255, 0.12);
+    --glass-specular-end: rgba(255, 255, 255, 0.02);
+    --glass-blur: 1.5px;
+    --glass-inner-blur: 1.5px;
+    --glass-shadow: 0 18px 44px var(--shadow-ambient);
+    --ambient-peach: rgba(255, 155, 120, 0.30);
+    --ambient-sky: rgba(110, 140, 255, 0.30);
+    --ambient-aqua: rgba(60, 205, 220, 0.24);
+    --ambient-tint-a: rgba(255, 205, 185, 0.06);
+    --ambient-tint-b: rgba(130, 185, 255, 0.06);
+    --glass-shade: rgba(0, 0, 0, 0.22);
+    --glass-glint: rgba(255, 255, 255, 0.12);
+    --shadow-ambient: rgba(0, 0, 0, 0.27);
+    --shadow-contact: rgba(0, 0, 0, 0.18);
+    --field: rgba(8, 15, 23, 0.30);
+    --hover: rgba(181, 210, 239, 0.10);
+    --selected: rgba(103, 210, 196, 0.17);
+    --selected-hover: rgba(103, 210, 196, 0.25);
+    --accent-ink: #c9f5ee;
+    --range-start: rgba(103, 210, 196, 0.85);
+    --range-end: rgba(103, 210, 196, 0.20);
+    --thumb: #d9f6f1;
+    --well: #05080b;
+    --well-border: #2a3746;
+    --log: rgba(5, 10, 16, 0.65);
+    --overlay: rgba(3, 6, 10, 0.62);
+    --scrollbar: #64778b;
+    --selection: rgba(103, 210, 196, 0.30);
+    --depth-hot: #ff6450;
+    --depth-warm: #f0b45c;
+    --depth-mid: #2db4a5;
+    --depth-cool: #1e5ca0;
+    --depth-far: #142860;
+    --radius-panel: 22px;
+    --radius-control: 11px;
+    --radius-chip: 18px;
+    --theme-duration: 260ms;
+    --glass-x: 50%;
+    --glass-y: 0%;
+    --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' opacity='.013' filter='url(%23n)' d='M0 0h160v160H0z'/%3E%3C/svg%3E");
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #e8edf4;
+    --panel: #f4f7fb;
+    --panel-border: rgba(66, 88, 114, 0.24);
+    --text: #253447;
+    --muted: #344252;
+    --strong: #17293d;
+    --secondary: #3e5169;
+    --accent: #096f63;
+    --accent-2: #97600c;
+    --danger: #bb303a;
+    --accent-glow: rgba(9, 111, 99, 0.5);
+    --danger-border: rgba(187, 48, 58, 0.35);
+    --danger-glow: rgba(187, 48, 58, 0.45);
+    --glass-top: rgba(255, 255, 255, 0.10);
+    --glass-bottom: rgba(255, 255, 255, 0.30);
+    --glass-edge: rgba(255, 255, 255, 0.45);
+    --glass-rim: rgba(255, 255, 255, 0.24);
+    --glass-highlight: rgba(255, 255, 255, 0.55);
+    --glass-contour: rgba(0, 0, 0, 0.06);
+    --glass-bevel: rgba(255, 255, 255, 0.28);
+    --glass-bevel-spread: rgba(255, 255, 255, 0.06);
+    --glass-topglow: rgba(255, 255, 255, 0.48);
+    --glass-sheen: rgba(255, 255, 255, 0.20);
+    --glass-wash: rgba(255, 255, 255, 0.08);
+    --glass-specular: rgba(255, 255, 255, 0.28);
+    --glass-specular-end: rgba(255, 255, 255, 0.04);
+    --glass-blur: 1.5px;
+    --glass-inner-blur: 1.5px;
+    --glass-shadow: 0 18px 44px var(--shadow-ambient);
+    --ambient-peach: rgba(255, 155, 120, 0.62);
+    --ambient-sky: rgba(110, 140, 255, 0.58);
+    --ambient-aqua: rgba(60, 205, 220, 0.46);
+    --ambient-tint-a: rgba(255, 205, 185, 0.18);
+    --ambient-tint-b: rgba(130, 185, 255, 0.18);
+    --glass-shade: rgba(62, 88, 120, 0.10);
+    --glass-glint: rgba(255, 255, 255, 0.18);
+    --shadow-ambient: rgba(20, 40, 70, 0.20);
+    --shadow-contact: rgba(20, 40, 70, 0.08);
+    --field: rgba(237, 243, 250, 0.32);
+    --hover: rgba(102, 132, 165, 0.12);
+    --selected: rgba(9, 111, 99, 0.12);
+    --selected-hover: rgba(9, 111, 99, 0.19);
+    --accent-ink: #075e54;
+    --range-start: #168779;
+    --range-end: rgba(9, 111, 99, 0.23);
+    --thumb: #ffffff;
+    --log: rgba(224, 233, 243, 0.65);
+    --overlay: rgba(105, 125, 152, 0.28);
+    --scrollbar: #7e90a5;
+    --selection: rgba(9, 111, 99, 0.20);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  #app { position: relative; height: 100%; width: 100%; }
+  #ambient {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: transparent;
+  }
+  #viewport { position: absolute; inset: 0; }
+  #viewport canvas { display: block; width: 100%; height: 100%; }
+  #glass-gpu {
+    position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%;
+    display: none; pointer-events: none;
+  }
+  body.glass-gpu { --field: rgba(255, 255, 255, 0.24); --glass-inner: rgba(255, 255, 255, 0.20); --glass-inner-blur: 1px; }
+  html[data-theme="dark"] body.glass-gpu { --field: rgba(20, 30, 42, 0.34); --glass-inner: rgba(20, 30, 42, 0.30); }
+  body.glass-gpu :where(select, button:not(.primary), .tab:not(.active), .text-input, .ckpt-list) {
+    background-image: none !important;
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    -webkit-backdrop-filter: blur(1px) saturate(1.15) !important;
+    backdrop-filter: blur(1px) saturate(1.15) !important;
+  }
+  html[data-theme="dark"] body.glass-gpu :where(select, button:not(.primary), .tab:not(.active), .text-input, .ckpt-list) {
+    background-color: rgba(20, 30, 42, 0.28) !important;
+  }
+  body.glass-gpu #glass-gpu { display: block; }
+  body.glass-gpu :where(#controls, #telemetry):not(.ckpt-item) {
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-color: transparent !important;
+    box-shadow: var(--glass-shadow), 0 2px 8px var(--shadow-contact), 0 0 0 1px var(--glass-contour) !important;
+  }
+
+  header {
+    position: absolute; z-index: 3; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 18px 22px 0;
+    pointer-events: none;
+  }
+  .brand { display: flex; flex-direction: column; gap: 4px; }
+  .brand h1 { margin: 0; font-size: 16px; letter-spacing: 0.02em; font-weight: 620; }
+  .brand .sub { color: var(--muted); font-size: 11.5px; }
+  .chips { display: flex; gap: 8px; pointer-events: auto; }
+  .chip {
+    display: flex; flex-direction: column; gap: 1px;
+    padding: 7px 11px; border: 1px solid var(--panel-border);
+    border-radius: var(--radius-chip);
+  }
+  .chip .k { color: var(--muted); font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; }
+  .chip .v { font-family: var(--mono); font-size: 11.5px; color: var(--accent); }
+
+  .panel {
+    position: absolute; z-index: 3;
+    border-radius: var(--radius-panel);
+  }
+  #controls { top: 86px; left: 22px; width: 286px; padding: 16px; max-height: calc(100vh - 128px); overflow-y: auto; }
+  #telemetry { top: 86px; right: 22px; width: 262px; padding: 16px 16px 14px; max-height: calc(100vh - 128px); overflow-y: auto; }
+  #controls::-webkit-scrollbar, #telemetry::-webkit-scrollbar { width: 6px; }
+  #controls::-webkit-scrollbar-thumb, #telemetry::-webkit-scrollbar-thumb {
+    background: var(--scrollbar); border-radius: 3px;
+  }
+  h2 {
+    margin: 0 0 12px; font-size: 10.5px; font-weight: 620;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--secondary);
+  }
+  .field { min-width: 0; margin-bottom: 12px; }
+  .field label { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 6px; }
+  .field label > span:first-child { flex: 1 1 auto; min-width: 0; }
+  .field label .val {
+    flex: 0 0 auto; font-family: var(--mono); color: var(--accent);
+    max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .stat .v, .chip .v, .val, .check-line { font-variant-numeric: tabular-nums; }
+  select, input[type="range"] { width: 100%; }
+  select {
+    appearance: none; color: var(--text);
+    border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12px; outline: none;
+  }
+  select:focus { border-color: var(--accent); }
+  input[type="range"] {
+    appearance: none; height: 3px; border-radius: 3px; outline: none;
+    background: linear-gradient(90deg, var(--range-start), var(--range-end));
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--thumb); border: 2px solid var(--accent); cursor: pointer;
+  }
+  .row { display: flex; gap: 8px; }
+  button {
+    flex: 1; padding: 8px 10px; font-size: 11.5px; font-weight: 560;
+    color: var(--text);
+    border: 1px solid var(--panel-border); border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background-color: var(--hover); }
+  button.primary { background-color: var(--selected); color: var(--accent-ink); }
+  button.primary:hover { background-color: var(--selected-hover); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .check-line {
+    margin-top: 9px; min-height: 15px; font-family: var(--mono);
+    font-size: 10.5px; color: var(--muted); line-height: 1.35;
+    overflow-wrap: anywhere; word-break: break-word;
+  }
+  .hint { margin-top: 10px; font-size: 10.5px; color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+  .hint b { color: var(--secondary); font-weight: 560; }
+  .divider { height: 1px; background: var(--panel-border); margin: 16px 0; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); }
+  .toggle input { accent-color: var(--accent); }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+  .stat { display: flex; flex-direction: column; gap: 1px; }
+  .stat .k { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .stat .v { font-family: var(--mono); font-size: 12px; color: var(--strong); }
+  .stat .v.hi { color: var(--accent); }
+  #depth-wrap { margin-top: 12px; }
+  #depth-head { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+  #depth-head .k { flex: 0 0 auto; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  #depth-head .v { margin-left: auto; white-space: nowrap; font-family: var(--mono); font-size: 9.5px; color: var(--muted); }
+  #depth-display {
+    flex: 0 0 78px; width: 78px; margin: 0; padding: 2px 4px; font-size: 9px;
+    color: var(--text); border: 1px solid var(--panel-border);
+    border-radius: 5px; outline: none;
+  }
+  #depth-profile {
+    width: 100%; height: 46px; display: block; margin-top: 6px;
+    border-radius: 6px; border: 1px solid var(--well-border); background: var(--well);
+  }
+  #depth-profile[hidden] { display: none; }
+  #depth-canvas {
+    width: 100%; aspect-ratio: 1; display: block; border-radius: 8px;
+    border: 1px solid var(--well-border); background: var(--well);
+    image-rendering: pixelated;
+  }
+  .depth-legend {
+    display: flex; align-items: center; gap: 6px; margin-top: 6px;
+    font-family: var(--mono); font-size: 9.5px; color: var(--muted);
+  }
+  .depth-bar {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: linear-gradient(90deg, var(--depth-hot), var(--depth-warm), var(--depth-mid), var(--depth-cool), var(--depth-far));
+  }
+  .depth-legend .no-hit { display: inline-flex; align-items: center; gap: 3px; }
+  .depth-legend .no-hit i { width: 7px; height: 7px; border-radius: 2px; background: var(--well); border: 1px solid var(--well-border); }
+  #camera-wrap { margin-top: 12px; }
+  #camera-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  #camera-head .k { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  #camera-head .v { font-family: var(--mono); font-size: 9.5px; color: var(--muted); }
+  #camera-canvas {
+    width: 100%; aspect-ratio: 16 / 9; display: block; border-radius: 8px;
+    border: 1px solid var(--well-border); background: var(--well);
+    image-rendering: pixelated;
+  }
+
+  #glass-badge {
+    position: absolute; left: 24px; top: 62px; z-index: 31;
+    padding: 6px 10px; border-radius: 999px;
+    color: var(--muted); background: var(--overlay);
+    border: 1px solid var(--line);
+    font: 500 10px/1 var(--mono, ui-monospace, monospace);
+    letter-spacing: .06em; text-transform: uppercase;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  #glass-badge[data-mode="webgpu"] { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  #glass-badge[data-mode="webgl2"] { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+  #status {
+    position: absolute; z-index: 3; bottom: 16px; left: 22px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--panel-border);
+    color: var(--muted); font-family: var(--mono); font-size: 10.5px;
+  }
+  #status::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); flex-shrink: 0;
+  }
+  #status.error { color: var(--danger); border-color: var(--danger-border); }
+  #status.error::before { background: var(--danger); box-shadow: 0 0 10px var(--danger-glow); }
+
+  .modal {
+    position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: var(--overlay); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .modal[hidden] { display: none; }
+  .modal-card {
+    width: min(700px, 94vw); max-height: 88vh; overflow: auto;
+    border-radius: var(--radius-panel); padding: 18px;
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .modal-head h2 { margin: 0; }
+  .modal-close {
+    flex: 0 0 auto; width: 28px; height: 28px; padding: 0; font-size: 16px; line-height: 1;
+    background: transparent; border: 1px solid var(--panel-border); border-radius: 8px;
+  }
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tab { flex: 0 0 auto; padding: 6px 10px; font-size: 11px; border: 1px solid var(--panel-border); border-radius: 8px; color: var(--muted); }
+  .tab.active { color: var(--accent-ink); background-color: var(--selected); }
+  .text-input {
+    flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px;
+    border: 1px solid var(--panel-border);
+    color: var(--text); font-family: var(--mono); font-size: 11px; outline: none;
+  }
+  .text-input:focus { border-color: var(--accent); }
+  .ckpt-list {
+    max-height: 300px; overflow: auto; margin-top: 8px;
+    border: 1px solid var(--panel-border); border-radius: 8px;
+  }
+  .ckpt-item {
+    display: block; width: 100%; text-align: left; padding: 8px 10px;
+    background: transparent; border: 0; border-bottom: 1px solid var(--panel-border);
+    border-radius: 0; color: var(--text);
+  }
+  .ckpt-item:last-child { border-bottom: 0; }
+  .ckpt-item:hover { background: var(--hover); }
+  .ckpt-item.selected { background: var(--selected); }
+  .ckpt-item.selected .name::after { content: " ✓"; color: var(--accent); }
+  .ckpt-item .name { font-family: var(--mono); font-size: 11px; color: var(--strong); overflow-wrap: anywhere; }
+  .ckpt-item .meta { margin-top: 2px; font-size: 10px; color: var(--muted); overflow-wrap: anywhere; }
+  .log {
+    max-height: 190px; overflow: auto; margin: 10px 0 0; padding: 9px;
+    background: var(--log); border: 1px solid var(--panel-border); border-radius: 8px;
+    font-family: var(--mono); font-size: 10px; line-height: 1.45;
+    color: var(--muted); white-space: pre-wrap; word-break: break-word;
+  }
+  #disclaimer {
+    position: absolute; z-index: 3; bottom: 16px; right: 22px; left: 360px;
+    font-size: 10px; line-height: 1.5; color: var(--muted);
+    text-align: right; pointer-events: none;
+  }
+  #obs-layout {
+    margin-top: 8px; font-family: var(--mono); font-size: 10px;
+    color: var(--muted); line-height: 1.5; word-break: break-word;
+  }
+  @media (max-width: 900px) {
+    #controls, #telemetry { width: 240px; }
+    #telemetry { display: none; }
+    #disclaimer { display: none; }
+  }
+  :where(.panel, .chip, #status, .modal-card, select, button, .tab, .text-input, .modal-close, .ckpt-list):not(.ckpt-item) {
+    border: 1px solid var(--glass-edge);
+    background-color: transparent;
+    background-image:
+      radial-gradient(ellipse at var(--glass-x) var(--glass-y), var(--glass-glint), transparent 65%),
+      linear-gradient(115deg, var(--glass-specular), transparent 32%, transparent 68%, var(--glass-specular-end)),
+      linear-gradient(180deg, var(--glass-wash), transparent 18%),
+      linear-gradient(145deg, var(--glass-top), var(--glass-bottom));
+    background-attachment: fixed, scroll, scroll, scroll;
+    -webkit-backdrop-filter: blur(var(--glass-inner-blur)) saturate(1.2);
+    backdrop-filter: blur(var(--glass-inner-blur)) saturate(1.2);
+    box-shadow: var(--glass-shadow), 0 2px 8px var(--shadow-contact),
+      inset 0 0 0 1px var(--glass-rim), inset 0 0 10px var(--glass-rim),
+      inset 0 1px 2px var(--glass-highlight), inset 0 -16px 28px var(--glass-shade);
+  }
+  :where(.panel, .modal-card):not(.ckpt-item) {
+    border-color: transparent;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+    -webkit-backdrop-filter: var(--lg-lens, blur(0px)) blur(var(--glass-blur)) saturate(1.3);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+    backdrop-filter: var(--lg-lens, blur(0px)) blur(var(--glass-blur)) saturate(1.3);
+    box-shadow: var(--glass-shadow), 0 2px 8px var(--shadow-contact), 0 0 0 1px var(--glass-contour),
+      inset 0 0 0 2px var(--glass-bevel-spread), inset 0 0 24px 8px var(--glass-bevel),
+      inset 0 4px 12px var(--glass-topglow), inset 0 -18px 30px var(--glass-shade);
+  }
+  .panel, .chip, .modal-card, #theme-toggle { corner-shape: superellipse(1.6); }
+  :where(select, button, .tab, .text-input, .modal-close, .ckpt-list):not(.ckpt-item) {
+    background-color: var(--field);
+    -webkit-backdrop-filter: blur(var(--glass-inner-blur)) saturate(1.2);
+    backdrop-filter: blur(var(--glass-inner-blur)) saturate(1.2);
+    corner-shape: superellipse(1.5);
+    border-radius: var(--radius-control);
+    box-shadow: 0 2px 5px var(--shadow-contact), inset 0 6px 16px -6px var(--glass-sheen),
+      inset 0 0 0 1px var(--glass-rim), inset 0 1px 2px var(--glass-highlight), inset 0 -1px 1px var(--glass-shade);
+  }
+  button.primary, .tab.active { background-image: var(--noise), linear-gradient(var(--selected), var(--selected)); }
+  button:hover:not(:disabled) { background-image: linear-gradient(var(--hover), var(--hover)); }
+  button.primary:hover:not(:disabled) { background-image: linear-gradient(var(--selected-hover), var(--selected-hover)); }
+  button:active:not(:disabled) { box-shadow: inset 0 2px 5px var(--shadow-contact); }
+  select option { background: var(--panel); color: var(--text); }
+  .text-input::placeholder { color: var(--muted); opacity: 1; }
+  :where(button, select, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  ::selection { background: var(--selection); color: var(--strong); }
+  * { scrollbar-color: var(--scrollbar) transparent; scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+  #theme-toggle {
+    corner-shape: superellipse(1.6);
+    flex: 0 0 44px; width: 44px; height: 44px; padding: 0;
+    display: grid; place-items: center; border-radius: var(--radius-chip); color: var(--text);
+  }
+  #theme-toggle svg { width: 19px; height: 19px; grid-area: 1 / 1; }
+  [data-theme="light"] .theme-sun, [data-theme="dark"] .theme-moon { display: none; }
+  html, body, .panel, .chip, #status, .modal, .modal-card, select, button, input, .log, .ckpt-list, .stat .v, .chip .v, .val, h2, .hint, .toggle, #obs-layout, #disclaimer {
+    transition: color var(--theme-duration) ease, background-color var(--theme-duration) ease,
+      border-color var(--theme-duration) ease, box-shadow var(--theme-duration) ease;
+  }
+  @media (max-width: 600px) {
+    header { padding: 14px 16px 0; gap: 10px; flex-wrap: wrap; }
+    .brand { width: 100%; }
+    .brand h1 { font-size: 15px; }
+    .brand .sub { max-width: 100%; font-size: 10px; }
+    .chips { width: 100%; align-items: center; }
+    .chip { padding: 6px 10px; min-width: 0; }
+    .chip:nth-child(3) { display: none; }
+    #theme-toggle { margin-left: auto; }
+    #controls { top: 124px; left: 16px; max-height: calc(100dvh - 180px); }
+    #status { left: 16px; right: 16px; bottom: 16px; font-size: 10px; }
+    .modal { padding: 16px; }
+    .modal-card { width: 100%; max-height: 88dvh; padding: 16px; }
+    button, select, .text-input { min-height: 44px; }
+    .modal-close { width: 44px; height: 44px; }
+    #depth-display { min-height: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-theme] { --theme-duration: 0ms; --glass-glint: transparent; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    #ambient { display: none; }
+    :where(.panel, .chip, #status, .modal-card, select, button, .tab, .text-input, .modal-close, .ckpt-list):not(.ckpt-item) {
+      background: var(--panel); backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    .modal { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :where(.panel, .chip, #status, .modal-card, select, button, .tab, .text-input, .modal-close, .ckpt-list):not(.ckpt-item) { background: var(--panel); }
+    .modal { background: var(--bg); }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "/node_modules/three/build/three.module.js",
+    "three/addons/": "/node_modules/three/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <div id="ambient" aria-hidden="true"></div>
+  <canvas id="glass-gpu" aria-hidden="true"></canvas>
+  <div id="viewport"></div>
+
+  <header>
+    <div class="brand">
+      <h1>O1 · MuJoCo WASM preview</h1>
+      <div class="sub">Sim-to-sim checkpoint viewer · browser physics, ONNX GRU policy</div>
+    </div>
+    <div class="chips">
+      <div class="chip"><span class="k">checkpoint</span><span class="v" id="ckpt-iter">—</span></div>
+      <div class="chip"><span class="k">sha256</span><span class="v" id="ckpt-sha">—</span></div>
+      <div class="chip"><span class="k">file</span><span class="v" id="ckpt-name">—</span></div>
+      <button id="theme-toggle" type="button" aria-label="Switch color theme" title="Toggle light / dark (T)">
+        <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg>
+        <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 13.2A9 9 0 0 1 10.8 3.2a9 9 0 1 0 10 10Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <aside class="panel" id="controls">
+    <h2>Checkpoint</h2>
+    <select id="ckpt-select" style="width:100%"></select>
+    <div class="row" style="margin-top:6px">
+      <button id="ckpt-load">Load</button>
+      <button id="ckpt-browse">Browse…</button>
+    </div>
+    <div class="check-line" id="ckpt-status">—</div>
+    <div class="divider"></div>
+    <h2>Scenario</h2>
+    <div class="field">
+      <label for="terrain-mode"><span>terrain type</span></label>
+      <select id="terrain-mode">
+        <option value="uniform" selected>uniform stairs</option>
+        <option value="grating">steel grating stairs</option>
+        <option value="slope">slope (up/down)</option>
+        <option value="hillside">paper hillside</option>
+        <option value="gap">gap</option>
+        <option value="platform">platform</option>
+        <option value="flat">flat ground</option>
+        <option value="curriculum">training curriculum</option>
+      </select>
+    </div>
+    <div class="field" id="direction-row">
+      <label for="terrain-dir"><span>direction</span><span class="val" id="terrain-meta">—</span></label>
+      <select id="terrain-dir"></select>
+    </div>
+    <div class="field" id="level-row">
+      <label for="terrain-level"><span>difficulty level</span><span class="val" id="level-value">7</span></label>
+      <input id="terrain-level" type="range" min="0" max="19" step="1" value="7" />
+    </div>
+    <div class="hint" id="hillside-hint" hidden></div>
+    <div class="row" id="uniform-row" style="gap:14px">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="uniform-riser"><span>riser</span><span class="val" id="uniform-riser-value">12.0 cm</span></label>
+        <input id="uniform-riser" type="range" min="3" max="30" step="0.5" value="12" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="uniform-tread"><span>tread</span><span class="val" id="uniform-tread-value">35 cm</span></label>
+        <input id="uniform-tread" type="range" min="15" max="60" step="1" value="35" />
+      </div>
+    </div>
+    <div class="field" id="uniform-steps-row" style="margin-top:10px">
+      <label for="uniform-steps"><span>steps per run</span><span class="val" id="uniform-steps-value">12</span></label>
+      <input id="uniform-steps" type="range" min="3" max="40" step="1" value="12" />
+    </div>
+    <div class="field" id="uniform-width-row" style="margin-top:10px">
+      <label for="uniform-width"><span>stair width</span><span class="val" id="uniform-width-value">4.0 m</span></label>
+      <input id="uniform-width" type="range" min="0.8" max="4.0" step="0.1" value="4.0" />
+    </div>
+    <div class="row" id="gap-row" style="gap:14px; display:none">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="gap-width"><span>gap width</span><span class="val" id="gap-width-value">30 cm</span></label>
+        <input id="gap-width" type="range" min="10" max="80" step="1" value="30" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="gap-depth"><span>gap depth</span><span class="val" id="gap-depth-value">45 cm</span></label>
+        <input id="gap-depth" type="range" min="30" max="60" step="1" value="45" />
+      </div>
+    </div>
+    <div class="field" id="gap-center-row" style="margin-top:10px; display:none">
+      <label for="gap-center"><span>gap centre x</span><span class="val" id="gap-center-value">2.0 m</span></label>
+      <input id="gap-center" type="range" min="1.0" max="6.0" step="0.1" value="2.0" />
+    </div>
+    <div class="row" id="platform-row" style="gap:14px; display:none">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="platform-height"><span>height</span><span class="val" id="platform-height-value">20 cm</span></label>
+        <input id="platform-height" type="range" min="5" max="40" step="1" value="20" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="platform-start"><span>start x</span><span class="val" id="platform-start-value">1.5 m</span></label>
+        <input id="platform-start" type="range" min="1.0" max="6.0" step="0.1" value="1.5" />
+      </div>
+    </div>
+    <div class="row" id="grating-row1" style="gap:14px; display:none">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="grating-riser"><span>riser</span><span class="val" id="grating-riser-value">20 cm</span></label>
+        <input id="grating-riser" type="range" min="10" max="30" step="1" value="20" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="grating-tread"><span>tread</span><span class="val" id="grating-tread-value">25 cm</span></label>
+        <input id="grating-tread" type="range" min="20" max="35" step="1" value="25" />
+      </div>
+    </div>
+    <div class="row" id="grating-row2" style="gap:14px; margin-top:10px; display:none">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="grating-steps"><span>steps</span><span class="val" id="grating-steps-value">12</span></label>
+        <input id="grating-steps" type="range" min="3" max="30" step="1" value="12" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="grating-width"><span>width</span><span class="val" id="grating-width-value">1.2 m</span></label>
+        <input id="grating-width" type="range" min="0.8" max="2.0" step="0.1" value="1.2" />
+      </div>
+    </div>
+    <div class="row" id="grating-row3" style="gap:14px; margin-top:10px; display:none">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="grating-bar"><span>bar</span><span class="val" id="grating-bar-value">3.0 cm</span></label>
+        <input id="grating-bar" type="range" min="2" max="5" step="0.1" value="3" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="grating-gap"><span>gap</span><span class="val" id="grating-gap-value">1.5 cm</span></label>
+        <input id="grating-gap" type="range" min="1" max="3" step="0.1" value="1.5" />
+      </div>
+    </div>
+    <div class="row" id="slope-row1" style="gap:14px; display:none">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="slope-angle"><span>angle</span><span class="val" id="slope-angle-value">12.0°</span></label>
+        <input id="slope-angle" type="range" min="0" max="20" step="0.5" value="12" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="slope-run"><span>run</span><span class="val" id="slope-run-value">3.10 m</span></label>
+        <input id="slope-run" type="range" min="1.5" max="3.5" step="0.1" value="3.1" />
+      </div>
+    </div>
+    <div class="field" id="slope-row2" style="margin-top:10px; display:none">
+      <label for="slope-width"><span>width</span><span class="val" id="slope-width-value">4.0 m</span></label>
+      <input id="slope-width" type="range" min="2.0" max="4.0" step="0.1" value="4.0" />
+    </div>
+
+    <div class="divider"></div>
+    <h2>Sim2Real</h2>
+    <div class="row" style="gap:14px">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-friction"><span>joint friction N·m</span><span class="val" id="s2r-friction-value">0.00</span></label>
+        <input id="s2r-friction" type="range" min="0" max="1" step="0.02" value="0" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-damping"><span>joint damping</span><span class="val" id="s2r-damping-value">0.00</span></label>
+        <input id="s2r-damping" type="range" min="0" max="2" step="0.05" value="0" />
+      </div>
+    </div>
+    <div class="row" style="gap:14px; margin-top:10px">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-delay"><span>actuator delay</span><span class="val" id="s2r-delay-value">0 ms</span></label>
+        <input id="s2r-delay" type="range" min="0" max="40" step="1" value="0" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-zero"><span>encoder zero</span><span class="val" id="s2r-zero-value">0.0°</span></label>
+        <input id="s2r-zero" type="range" min="0" max="3" step="0.1" value="0" />
+      </div>
+    </div>
+    <div class="row" style="gap:14px; margin-top:10px">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-pitch"><span>IMU pitch bias</span><span class="val" id="s2r-pitch-value">0.0°</span></label>
+        <input id="s2r-pitch" type="range" min="0" max="5" step="0.1" value="0" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-gyro"><span>gyro bias</span><span class="val" id="s2r-gyro-value">0.0°/s</span></label>
+        <input id="s2r-gyro" type="range" min="0" max="5" step="0.1" value="0" />
+      </div>
+    </div>
+    <div class="row" style="gap:14px; margin-top:10px">
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-velfilter"><span>joint vel filter</span><span class="val" id="s2r-velfilter-value">0 ms</span></label>
+        <input id="s2r-velfilter" type="range" min="0" max="60" step="1" value="0" />
+      </div>
+      <div class="field" style="flex:1; margin-bottom:0">
+        <label for="s2r-backlash"><span>backlash</span><span class="val" id="s2r-backlash-value">0.0°</span></label>
+        <input id="s2r-backlash" type="range" min="0" max="3" step="0.1" value="0" />
+      </div>
+    </div>
+    <label class="toggle" style="margin-top:10px;">
+      <input type="checkbox" id="s2r-shoe" /> shoe sole (flat, -9 mm, torsion friction)
+    </label>
+    <div class="hint" style="margin-top:6px;">
+      URL: <code>?mode=uniform&amp;direction=down&amp;riser=18&amp;tread=28&amp;steps=9&amp;width=100&amp;shoe=1&amp;friction=0.2&amp;delay=25&amp;zero=1.5&amp;pitch=1.5&amp;gyro=2&amp;velfilter=25&amp;backlash=1</code>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button id="btn-play" class="primary" data-running="true">Pause</button>
+      <button id="btn-reset">Reset</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="btn-check">Run 250-step check</button>
+    </div>
+    <div class="check-line" id="check-result">idle</div>
+    <div class="divider"></div>
+    <h2>Velocity command</h2>
+    <div class="field">
+      <label for="cmd-vx"><span>forward speed</span><span class="val" id="cmd-vx-value">0.45</span></label>
+      <input id="cmd-vx" type="range" min="0" max="1.2" step="0.01" value="0.45" />
+    </div>
+    <div class="field">
+      <label for="cmd-vy"><span>strafe speed (Q/E)</span><span class="val" id="cmd-vy-value">0.00</span></label>
+      <input id="cmd-vy" type="range" min="0" max="0.5" step="0.01" value="0" />
+    </div>
+    <div class="field">
+      <label for="cmd-wz"><span>turn rate</span><span class="val" id="cmd-wz-value">0.80</span></label>
+      <input id="cmd-wz" type="range" min="0" max="1.2" step="0.01" value="0.8" />
+    </div>
+    <div class="check-line" id="cmd-active">active  vx 0.00 · vy 0.00 · wz 0.00</div>
+    <div class="hint" style="margin-top:4px;">
+      <b>W/S</b> forward/back · <b>A/D</b> turn · release to stop
+    </div>
+
+    <div class="divider"></div>
+    <h2>Simulation</h2>
+    <div class="field">
+      <label for="quality"><span>render quality</span></label>
+      <select id="quality">
+        <option value="performance">performance (0.7x)</option>
+        <option value="balanced" selected>balanced (1x)</option>
+        <option value="quality">quality (native)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="speed"><span>time scale</span><span class="val" id="speed-value">1.00×</span></label>
+      <input id="speed" type="range" min="0.1" max="3" step="0.05" value="1" />
+    </div>
+    <label class="toggle" style="margin-top: 10px;">
+      <input type="checkbox" id="follow" checked /> camera follows pelvis
+    </label>
+    <label class="toggle" style="margin-top: 8px;">
+      <input type="checkbox" id="lock-waist" /> lock waist tilt (roll/pitch)
+    </label>
+    <label class="toggle" style="margin-top: 8px;">
+      <input type="checkbox" id="show-camera" /> show policy camera view
+    </label>
+    <div class="hint" id="render-note" style="margin-top:8px;"></div>
+    <div class="hint">
+      <b>Space</b> pause · <b>R</b> reset · 50 Hz control in every mode. Depth input: 64×36
+      ray grid → centre 36×36 → /2.5 m.
+    </div>
+  </aside>
+
+  <aside class="panel" id="telemetry">
+    <h2>Telemetry</h2>
+    <div class="stat-grid">
+      <div class="stat"><span class="k">sim time</span><span class="v hi" id="stat-time">0.00 s</span></div>
+      <div class="stat"><span class="k">steps</span><span class="v" id="stat-steps">0</span></div>
+      <div class="stat"><span class="k">pelvis z</span><span class="v hi" id="stat-z">—</span></div>
+      <div class="stat"><span class="k">torso z</span><span class="v" id="stat-torso">—</span></div>
+      <div class="stat"><span class="k">clearance</span><span class="v hi" id="stat-clearance">—</span></div>
+      <div class="stat"><span class="k">speed</span><span class="v" id="stat-speed">—</span></div>
+      <div class="stat"><span class="k">base x, y</span><span class="v" id="stat-xy">—</span></div>
+      <div class="stat"><span class="k">yaw</span><span class="v" id="stat-yaw">—</span></div>
+      <div class="stat"><span class="k">contacts</span><span class="v" id="stat-contacts">—</span></div>
+      <div class="stat"><span class="k">inference</span><span class="v" id="stat-infer">—</span></div>
+      <div class="stat"><span class="k">render fps</span><span class="v" id="stat-fps">—</span></div>
+      <div class="stat"><span class="k">control rate</span><span class="v hi" id="stat-chz">—</span></div>
+      <div class="stat"><span class="k">sim rate</span><span class="v" id="stat-simrate">—</span></div>
+      <div class="stat"><span class="k">step ms</span><span class="v" id="stat-step">—</span></div>
+      <div class="stat"><span class="k">wasm threads</span><span class="v" id="stat-threads">—</span></div>
+      <div class="stat"><span class="k">render ms</span><span class="v" id="stat-render">—</span></div>
+      <div class="stat"><span class="k">depth ms</span><span class="v" id="stat-depth">—</span></div>
+      <div class="stat"><span class="k">depth lag</span><span class="v" id="stat-dlag">—</span></div>
+      <div class="stat"><span class="k">max |action|</span><span class="v" id="stat-action">—</span></div>
+    </div>
+
+    <div id="camera-wrap" hidden>
+      <div id="camera-head"><span class="k">policy camera · geometry</span><span class="v">same pose as depth</span></div>
+      <canvas id="camera-canvas" width="64" height="36"></canvas>
+    </div>
+
+    <div id="depth-wrap">
+      <div id="depth-head"><span class="k">depth input</span><select id="depth-display" title="raw policy depth, fixed 0–2.5 m"><option value="real" selected>real</option><option value="analysis">analysis</option></select><span class="v" id="depth-range" title="fixed 0–2.5 m scale">—</span></div>
+      <canvas id="depth-canvas" width="36" height="36"></canvas>
+      <div class="depth-legend">
+        <span>near</span><div class="depth-bar" id="depth-bar"></div><span>far</span>
+        <span class="no-hit"><i></i>no hit</span>
+      </div>
+      <canvas id="depth-profile" width="180" height="46"></canvas>
+    </div>
+    <div id="obs-layout">—</div>
+  </aside>
+
+  <div class="modal" id="ckpt-modal" role="dialog" aria-modal="true" aria-labelledby="ckpt-modal-title" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="ckpt-modal-title">Checkpoint browser</h2>
+        <button class="modal-close" id="ckpt-close" title="Close">×</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" id="tab-server" data-tab="server">Server directory</button>
+        <button class="tab" id="tab-upload" data-tab="upload">Upload .pt</button>
+      </div>
+      <div id="pane-server">
+        <div class="row">
+          <input class="text-input" id="ckpt-dir" spellcheck="false" placeholder="/absolute/path/to/run/or/checkpoints" />
+          <button id="ckpt-scan">Scan</button>
+        </div>
+        <div class="check-line" id="ckpt-dir-note">—</div>
+        <div class="ckpt-list" id="ckpt-server-list"></div>
+      </div>
+      <div id="pane-upload" hidden>
+        <div class="row">
+          <input class="text-input" type="file" id="ckpt-file" accept=".pt" />
+          <button id="ckpt-upload">Upload</button>
+        </div>
+        <div class="check-line" id="ckpt-upload-note">—</div>
+        <div class="ckpt-list" id="ckpt-upload-list"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="row">
+        <button class="primary" id="ckpt-export">Export &amp; load</button>
+        <button id="ckpt-cancel">Close</button>
+      </div>
+      <div class="check-line" id="ckpt-export-status">select a checkpoint</div>
+      <pre class="log" id="ckpt-log">exporter log will appear here</pre>
+    </div>
+  </div>
+
+  <div id="glass-badge" aria-live="polite">glass · css</div>
+  <div id="status" role="status" aria-live="polite">initializing…</div>
+  <div id="disclaimer">
+    Preview only: MuJoCo contact physics, nominal inertias/friction and clean depth differ from the
+    PhysX training environment. Not a gait or deployment acceptance test.
+  </div>
+</div>
+
+<script>
+  (() => {
+    const reducedTransparency = matchMedia('(prefers-reduced-transparency: reduce)');
+    if (!(CSS.supports('backdrop-filter', 'blur(1px)') || CSS.supports('-webkit-backdrop-filter', 'blur(1px)'))) return;
+    const namespace = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(namespace, 'svg');
+    svg.setAttribute('width', '0');
+    svg.setAttribute('height', '0');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.style.position = 'absolute';
+    const defs = document.createElementNS(namespace, 'defs');
+    svg.append(defs);
+    document.body.append(svg);
+    document.querySelectorAll('#controls, #telemetry, .modal-card').forEach((element, index) => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      const id = `lg-lens-${index}`;
+      const filter = document.createElementNS(namespace, 'filter');
+      filter.id = id;
+      filter.setAttribute('color-interpolation-filters', 'sRGB');
+      filter.setAttribute('filterUnits', 'userSpaceOnUse');
+      filter.setAttribute('primitiveUnits', 'userSpaceOnUse');
+      const image = document.createElementNS(namespace, 'feImage');
+      for (const [name, value] of Object.entries({ x: '0', y: '0', width: '100%', height: '100%', preserveAspectRatio: 'none', result: 'map' })) image.setAttribute(name, value);
+      const displacement = document.createElementNS(namespace, 'feDisplacementMap');
+      for (const [name, value] of Object.entries({ in: 'SourceGraphic', in2: 'map', scale: '128', xChannelSelector: 'R', yChannelSelector: 'G' })) displacement.setAttribute(name, value);
+      filter.append(image, displacement);
+      defs.append(filter);
+      let frame = null;
+      let previousSize = '';
+      const update = () => {
+        frame = null;
+        if (reducedTransparency.matches) {
+          element.style.removeProperty('--lg-lens');
+          return;
+        }
+        const width = element.offsetWidth;
+        const height = element.offsetHeight;
+        if (!width || !height) return;
+        const size = `${width}x${height}`;
+        if (size !== previousSize) {
+          filter.setAttribute('x', '-96');
+          filter.setAttribute('y', '-96');
+          filter.setAttribute('width', String(width + 192));
+          filter.setAttribute('height', String(height + 192));
+          image.setAttribute('x', '0');
+          image.setAttribute('y', '0');
+          image.setAttribute('width', String(width));
+          image.setAttribute('height', String(height));
+          const ratio = Math.min(0.5, Math.sqrt(150000 / (width * height)));
+          canvas.width = Math.max(1, Math.round(width * ratio));
+          canvas.height = Math.max(1, Math.round(height * ratio));
+          const pixels = context.createImageData(canvas.width, canvas.height);
+          const radius = parseFloat(getComputedStyle(element).borderTopLeftRadius);
+          const band = Math.min(width, height) * 0.10;
+          const amount = Math.min(Math.min(width, height) * 0.10, 32);
+          const distance = (horizontal, vertical) => {
+            const qx = Math.abs(horizontal - width / 2) - (width / 2 - radius);
+            const qy = Math.abs(vertical - height / 2) - (height / 2 - radius);
+            return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - radius;
+          };
+          for (let row = 0; row < canvas.height; row++) {
+            for (let column = 0; column < canvas.width; column++) {
+              const horizontal = (column + 0.5) * width / canvas.width;
+              const vertical = (row + 0.5) * height / canvas.height;
+              const depth = distance(horizontal, vertical);
+              const falloff = 1 - Math.max(0, Math.min(1, -depth / band));
+              const strength = depth <= 0 ? amount * falloff * falloff * (3 - 2 * falloff) : 0;
+              const normalX = distance(horizontal + 0.75, vertical) - distance(horizontal - 0.75, vertical);
+              const normalY = distance(horizontal, vertical + 0.75) - distance(horizontal, vertical - 0.75);
+              const magnitude = Math.hypot(normalX, normalY) || 1;
+              const offset = 4 * (row * canvas.width + column);
+              pixels.data[offset] = Math.round(128 + normalX / magnitude * strength / 128 * 255);
+              pixels.data[offset + 1] = Math.round(128 + normalY / magnitude * strength / 128 * 255);
+              pixels.data[offset + 2] = 128;
+              pixels.data[offset + 3] = 255;
+            }
+          }
+          context.putImageData(pixels, 0, 0);
+          image.setAttribute('href', canvas.toDataURL());
+          previousSize = size;
+        }
+        element.style.setProperty('--lg-lens', `url(#${id})`);
+      };
+      const schedule = () => {
+        if (frame === null) frame = requestAnimationFrame(update);
+      };
+      new ResizeObserver(schedule).observe(element);
+      reducedTransparency.addEventListener('change', schedule);
+      schedule();
+    });
+  })();
+  const themeToggle = document.getElementById('theme-toggle');
+  const updateThemeLabel = () => themeToggle.setAttribute('aria-label', `Switch to ${window.__theme.get() === 'dark' ? 'light' : 'dark'} mode`);
+  themeToggle.addEventListener('click', () => window.__theme.toggle());
+  document.addEventListener('themechange', updateThemeLabel);
+  updateThemeLabel();
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let glassFrame = null;
+  let glassPointer;
+  document.addEventListener('pointermove', (event) => {
+    if (reducedMotion.matches || event.pointerType !== 'mouse') return;
+    glassPointer = { x: event.clientX, y: event.clientY };
+    if (glassFrame !== null) return;
+    glassFrame = requestAnimationFrame(() => {
+      glassFrame = null;
+      if (reducedMotion.matches) return;
+      const style = document.documentElement.style;
+      style.cssText += `; --glass-x: ${glassPointer.x / innerWidth * 100}%; --glass-y: ${glassPointer.y / innerHeight * 100}%;`;
+    });
+  }, { passive: true });
+  addEventListener('keydown', (e) => {
+    if (!document.getElementById('ckpt-modal').hidden) return;
+    if (e.key !== 'Escape' && e.target.closest('input,select,textarea,[contenteditable="true"],[contenteditable=""]')) return;
+    if (e.code === 'Space' && e.target.closest('button,select,a[href]')) return;
+    if (e.key.toLowerCase() === 't' && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey &&
+      !e.target.matches('input, select, textarea') && !e.target.isContentEditable) {
+      e.preventDefault();
+      window.__theme.toggle();
+      return;
+    }
+    if (e.code === 'Space') {
+      e.preventDefault();
+      document.getElementById('btn-play')?.click();
+    } else if (e.key === 'r' || e.key === 'R') {
+      document.getElementById('btn-reset')?.click();
+    }
+  });
+</script>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

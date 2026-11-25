@@ -1,0 +1,5378 @@
+{
+  "checkpoint": {
+    "iteration": 16175,
+    "path": "/home/ubuntu/workspace/instinct-ssr-stair-audited-fromzero-20261012/outputs/source_snapshots/bd961d3e3f21a8442dd008234503dcc9bbdacfa7/external_worktrees/instinctlab_stage4/logs/instinct_rl/o1_parkour_stair_audit/20261020_063953_stair_audit_fromzero_seed_0_geometry_0_stage_18_from20261020_062741/latest.pt",
+    "sha256": "1d679b4a1563b3db9bbea121495abf450a944d04087a3dbd67b23873ee0434c8",
+    "source_sha": "bd961d3e3f21a8442dd008234503dcc9bbdacfa7",
+    "run_dir": "/home/ubuntu/workspace/instinct-ssr-stair-audited-fromzero-20261012/outputs/source_snapshots/bd961d3e3f21a8442dd008234503dcc9bbdacfa7/external_worktrees/instinctlab_stage4/logs/instinct_rl/o1_parkour_stair_audit/20261020_063953_stair_audit_fromzero_seed_0_geometry_0_stage_18_from20261020_062741",
+    "label": "latest"
+  },
+  "engine": {
+    "training": "IsaacLab/PhysX",
+    "preview": "MuJoCo WASM",
+    "physics_dt": 0.005,
+    "control_dt": 0.02
+  },
+  "joints": [
+    {
+      "name": "left_hip_pitch_joint",
+      "qpos": 7,
+      "qvel": 6,
+      "actuator": 0,
+      "default": -0.1,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "right_hip_pitch_joint",
+      "qpos": 13,
+      "qvel": 12,
+      "actuator": 6,
+      "default": -0.1,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "waist_yaw_joint",
+      "qpos": 19,
+      "qvel": 18,
+      "actuator": 12,
+      "default": 0.0,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "left_hip_roll_joint",
+      "qpos": 8,
+      "qvel": 7,
+      "actuator": 1,
+      "default": 0.0,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "right_hip_roll_joint",
+      "qpos": 14,
+      "qvel": 13,
+      "actuator": 7,
+      "default": 0.0,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "waist_roll_joint",
+      "qpos": 20,
+      "qvel": 19,
+      "actuator": 13,
+      "default": 0.0,
+      "scale": 0.664,
+      "kp": 20.320258756855598,
+      "kd": 1.2936278504609509,
+      "effort": 54.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_hip_yaw_joint",
+      "qpos": 9,
+      "qvel": 8,
+      "actuator": 2,
+      "default": 0.0,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "right_hip_yaw_joint",
+      "qpos": 15,
+      "qvel": 14,
+      "actuator": 8,
+      "default": 0.0,
+      "scale": 0.232,
+      "kp": 94.6832207696686,
+      "kd": 6.0277210455138714,
+      "effort": 88.0,
+      "velocity_limit": 30.05
+    },
+    {
+      "name": "waist_pitch_joint",
+      "qpos": 21,
+      "qvel": 20,
+      "actuator": 14,
+      "default": 0.0,
+      "scale": 0.664,
+      "kp": 20.320258756855598,
+      "kd": 1.2936278504609509,
+      "effort": 54.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_knee_joint",
+      "qpos": 10,
+      "qvel": 9,
+      "actuator": 3,
+      "default": 0.33,
+      "scale": 0.217,
+      "kp": 161.39104786604855,
+      "kd": 10.27447321575859,
+      "effort": 140.0,
+      "velocity_limit": 17.49
+    },
+    {
+      "name": "right_knee_joint",
+      "qpos": 16,
+      "qvel": 15,
+      "actuator": 9,
+      "default": 0.33,
+      "scale": 0.217,
+      "kp": 161.39104786604855,
+      "kd": 10.27447321575859,
+      "effort": 140.0,
+      "velocity_limit": 17.49
+    },
+    {
+      "name": "left_shoulder_pitch_joint",
+      "qpos": 22,
+      "qvel": 21,
+      "actuator": 15,
+      "default": 0.2,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_shoulder_pitch_joint",
+      "qpos": 29,
+      "qvel": 28,
+      "actuator": 22,
+      "default": 0.2,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_ankle_pitch_joint",
+      "qpos": 11,
+      "qvel": 10,
+      "actuator": 4,
+      "default": -0.2,
+      "scale": 0.664,
+      "kp": 20.320258756855598,
+      "kd": 1.2936278504609509,
+      "effort": 54.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_ankle_pitch_joint",
+      "qpos": 17,
+      "qvel": 16,
+      "actuator": 10,
+      "default": -0.2,
+      "scale": 0.664,
+      "kp": 20.320258756855598,
+      "kd": 1.2936278504609509,
+      "effort": 54.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_shoulder_roll_joint",
+      "qpos": 23,
+      "qvel": 22,
+      "actuator": 16,
+      "default": 0.2,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_shoulder_roll_joint",
+      "qpos": 30,
+      "qvel": 29,
+      "actuator": 23,
+      "default": -0.2,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_ankle_roll_joint",
+      "qpos": 12,
+      "qvel": 11,
+      "actuator": 5,
+      "default": 0.0,
+      "scale": 0.24,
+      "kp": 20.320258756855598,
+      "kd": 1.2936278504609509,
+      "effort": 54.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_ankle_roll_joint",
+      "qpos": 18,
+      "qvel": 17,
+      "actuator": 11,
+      "default": 0.0,
+      "scale": 0.24,
+      "kp": 20.320258756855598,
+      "kd": 1.2936278504609509,
+      "effort": 54.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_shoulder_yaw_joint",
+      "qpos": 24,
+      "qvel": 23,
+      "actuator": 17,
+      "default": 0.0,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_shoulder_yaw_joint",
+      "qpos": 31,
+      "qvel": 30,
+      "actuator": 24,
+      "default": 0.0,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_elbow_joint",
+      "qpos": 25,
+      "qvel": 24,
+      "actuator": 18,
+      "default": 0.9,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_elbow_joint",
+      "qpos": 32,
+      "qvel": 31,
+      "actuator": 25,
+      "default": 0.9,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_wrist_roll_joint",
+      "qpos": 26,
+      "qvel": 25,
+      "actuator": 19,
+      "default": 0.0,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "right_wrist_roll_joint",
+      "qpos": 33,
+      "qvel": 32,
+      "actuator": 26,
+      "default": 0.0,
+      "scale": 0.664,
+      "kp": 10.160129378427799,
+      "kd": 0.6468139252304754,
+      "effort": 27.0,
+      "velocity_limit": 26.18
+    },
+    {
+      "name": "left_wrist_pitch_joint",
+      "qpos": 27,
+      "qvel": 26,
+      "actuator": 20,
+      "default": 0.0,
+      "scale": 0.223,
+      "kp": 7.275753928814349,
+      "kd": 0.46318888100967154,
+      "effort": 6.5,
+      "velocity_limit": 20.94
+    },
+    {
+      "name": "right_wrist_pitch_joint",
+      "qpos": 34,
+      "qvel": 33,
+      "actuator": 27,
+      "default": 0.0,
+      "scale": 0.223,
+      "kp": 7.275753928814349,
+      "kd": 0.46318888100967154,
+      "effort": 6.5,
+      "velocity_limit": 20.94
+    },
+    {
+      "name": "left_wrist_yaw_joint",
+      "qpos": 28,
+      "qvel": 27,
+      "actuator": 21,
+      "default": 0.0,
+      "scale": 0.223,
+      "kp": 7.275753928814349,
+      "kd": 0.46318888100967154,
+      "effort": 6.5,
+      "velocity_limit": 20.94
+    },
+    {
+      "name": "right_wrist_yaw_joint",
+      "qpos": 35,
+      "qvel": 34,
+      "actuator": 28,
+      "default": 0.0,
+      "scale": 0.223,
+      "kp": 7.275753928814349,
+      "kd": 0.46318888100967154,
+      "effort": 6.5,
+      "velocity_limit": 20.94
+    }
+  ],
+  "root_body": 1,
+  "torso_body": 16,
+  "body_names": [
+    "world",
+    "pelvis",
+    "left_hip_pitch_link",
+    "left_hip_roll_link",
+    "left_hip_yaw_link",
+    "left_knee_link",
+    "left_ankle_pitch_link",
+    "left_ankle_roll_link",
+    "right_hip_pitch_link",
+    "right_hip_roll_link",
+    "right_hip_yaw_link",
+    "right_knee_link",
+    "right_ankle_pitch_link",
+    "right_ankle_roll_link",
+    "waist_yaw_link",
+    "waist_roll_link",
+    "torso_link",
+    "left_shoulder_pitch_link",
+    "left_shoulder_roll_link",
+    "left_shoulder_yaw_link",
+    "left_elbow_link",
+    "left_wrist_roll_link",
+    "left_wrist_pitch_link",
+    "left_wrist_yaw_link",
+    "right_shoulder_pitch_link",
+    "right_shoulder_roll_link",
+    "right_shoulder_yaw_link",
+    "right_elbow_link",
+    "right_wrist_roll_link",
+    "right_wrist_pitch_link",
+    "right_wrist_yaw_link",
+    "head_link",
+    "o1_depth_camera_original_link",
+    "o1_depth_camera_relocated_link"
+  ],
+  "meshes": [
+    "pelvis.STL",
+    "left_hip_pitch_link.STL",
+    "left_hip_roll_link.STL",
+    "left_hip_yaw_link.STL",
+    "left_knee_link.STL",
+    "left_ankle_pitch_link.STL",
+    "left_ankle_roll_link.STL",
+    "right_hip_pitch_link.STL",
+    "right_hip_roll_link.STL",
+    "right_hip_yaw_link.STL",
+    "right_knee_link.STL",
+    "right_ankle_pitch_link.STL",
+    "right_ankle_roll_link.STL",
+    "waist_yaw_link.STL",
+    "waist_roll_link.STL",
+    "torso_link.STL",
+    "left_shoulder_pitch_link.STL",
+    "left_shoulder_roll_link.STL",
+    "left_shoulder_yaw_link.STL",
+    "left_elbow_link.STL",
+    "left_wrist_roll_link.STL",
+    "left_wrist_pitch_link.STL",
+    "left_wrist_yaw_link.STL",
+    "right_shoulder_pitch_link.STL",
+    "right_shoulder_roll_link.STL",
+    "right_shoulder_yaw_link.STL",
+    "right_elbow_link.STL",
+    "right_wrist_roll_link.STL",
+    "right_wrist_pitch_link.STL",
+    "right_wrist_yaw_link.STL",
+    "head_link.STL"
+  ],
+  "observation_terms": [
+    {
+      "name": "base_ang_vel",
+      "width": 3,
+      "history": 8,
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "name": "projected_gravity",
+      "width": 3,
+      "history": 8,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "velocity_commands",
+      "width": 3,
+      "history": 8,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "joint_pos_rel",
+      "width": 29,
+      "history": 8,
+      "scale": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "joint_vel_rel",
+      "width": 29,
+      "history": 8,
+      "scale": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ]
+    },
+    {
+      "name": "last_action",
+      "width": 29,
+      "history": 8,
+      "scale": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "observation_dim": 2064,
+  "hidden_shape": [
+    1,
+    1,
+    256
+  ],
+  "camera": {
+    "offset": {
+      "pos": [
+        0.10407773149,
+        2.2481e-07,
+        0.07166348114
+      ],
+      "rot": [
+        0.9116516173414916,
+        0.0,
+        0.41096390181942083,
+        0.0
+      ],
+      "convention": "world"
+    },
+    "pattern": {
+      "func": "isaaclab.sensors.ray_caster.patterns.patterns:pinhole_camera_pattern",
+      "focal_length": 1.0,
+      "horizontal_aperture": 1.9829684971963653,
+      "vertical_aperture": 1.1152440419261633,
+      "horizontal_aperture_offset": 0.0,
+      "vertical_aperture_offset": 0.0,
+      "width": 64,
+      "height": 36
+    },
+    "depth_max": 2.5
+  },
+  "terrain": {
+    "up": [
+      {
+        "seed": 546762614,
+        "direction": "up",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.015,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.9000000000000004,
+              4.3
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.9000000000000004,
+              4.3,
+              4.65
+            ],
+            "heights": [
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.015
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 4.65,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 691209253,
+        "direction": "up",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.0245,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.15,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.2,
+              3.5
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.15,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.2,
+              3.5,
+              3.8000000000000003
+            ],
+            "heights": [
+              0.025,
+              0.025,
+              0.025,
+              0.02,
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.8000000000000003,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 566779217,
+        "direction": "up",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.03916666666666667,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.6,
+              1.85,
+              2.15,
+              2.45,
+              2.75,
+              3.0500000000000003,
+              3.3000000000000003,
+              3.6,
+              3.85,
+              4.15
+            ],
+            "ends": [
+              1.25,
+              1.6,
+              1.85,
+              2.15,
+              2.45,
+              2.75,
+              3.0500000000000003,
+              3.3000000000000003,
+              3.6,
+              3.85,
+              4.15,
+              4.45
+            ],
+            "heights": [
+              0.04,
+              0.035,
+              0.04,
+              0.04,
+              0.04,
+              0.04,
+              0.04,
+              0.035,
+              0.04,
+              0.04,
+              0.04,
+              0.04
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 4.45,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 487817217,
+        "direction": "up",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.039,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.55,
+              1.8,
+              2.1,
+              2.35,
+              2.6500000000000004,
+              2.95,
+              3.2,
+              3.45
+            ],
+            "ends": [
+              1.25,
+              1.55,
+              1.8,
+              2.1,
+              2.35,
+              2.6500000000000004,
+              2.95,
+              3.2,
+              3.45,
+              3.7
+            ],
+            "heights": [
+              0.04,
+              0.035,
+              0.04,
+              0.04,
+              0.04,
+              0.04,
+              0.035,
+              0.04,
+              0.04,
+              0.04
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.7,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 219536274,
+        "direction": "up",
+        "num_steps": 6,
+        "width_m": 4.0,
+        "riser_height_m": 0.04833333333333333,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.8000000000000003
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.2
+            ],
+            "heights": [
+              0.05,
+              0.05,
+              0.055,
+              0.045,
+              0.045,
+              0.045
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.2,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 514041964,
+        "direction": "up",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.05791666666666667,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.95,
+              3.3000000000000003,
+              3.7,
+              4.05,
+              4.45,
+              4.800000000000001,
+              5.15
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.95,
+              3.3000000000000003,
+              3.7,
+              4.05,
+              4.45,
+              4.800000000000001,
+              5.15,
+              5.5
+            ],
+            "heights": [
+              0.065,
+              0.055,
+              0.055,
+              0.055,
+              0.055,
+              0.06,
+              0.055,
+              0.065,
+              0.055,
+              0.055,
+              0.06,
+              0.06
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 5.5,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1846923786,
+        "direction": "up",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.068,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004
+            ],
+            "heights": [
+              0.07,
+              0.075,
+              0.065,
+              0.065,
+              0.065
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 2.9000000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 967096425,
+        "direction": "up",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.07666666666666667,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6500000000000001,
+              1.9500000000000002,
+              2.25,
+              2.5500000000000003,
+              2.85,
+              3.1,
+              3.4000000000000004,
+              3.7,
+              4.0,
+              4.3
+            ],
+            "ends": [
+              1.35,
+              1.6500000000000001,
+              1.9500000000000002,
+              2.25,
+              2.5500000000000003,
+              2.85,
+              3.1,
+              3.4000000000000004,
+              3.7,
+              4.0,
+              4.3,
+              4.55
+            ],
+            "heights": [
+              0.075,
+              0.08,
+              0.075,
+              0.075,
+              0.07,
+              0.075,
+              0.08,
+              0.075,
+              0.08,
+              0.075,
+              0.085,
+              0.075
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 4.55,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 2140277469,
+        "direction": "up",
+        "num_steps": 9,
+        "width_m": 4.0,
+        "riser_height_m": 0.09277777777777779,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              3.0500000000000003,
+              3.35
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              3.0500000000000003,
+              3.35,
+              3.6500000000000004
+            ],
+            "heights": [
+              0.09,
+              0.1,
+              0.085,
+              0.09,
+              0.09,
+              0.095,
+              0.095,
+              0.095,
+              0.095
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.6500000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 60914157,
+        "direction": "up",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.099,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6,
+              1.9000000000000001,
+              2.25,
+              2.5500000000000003,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.3000000000000003,
+              3.6
+            ],
+            "ends": [
+              1.35,
+              1.6,
+              1.9000000000000001,
+              2.25,
+              2.5500000000000003,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.3000000000000003,
+              3.6,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.1,
+              0.105,
+              0.1,
+              0.1,
+              0.09,
+              0.1,
+              0.1,
+              0.095,
+              0.1,
+              0.1
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.9000000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1912112502,
+        "direction": "up",
+        "num_steps": 5,
+        "width_m": 1.5,
+        "riser_height_m": 0.11,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.8,
+              2.2,
+              2.6
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.8,
+              2.2,
+              2.6,
+              2.95
+            ],
+            "heights": [
+              0.105,
+              0.11,
+              0.11,
+              0.105,
+              0.12
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 2.95,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1995236120,
+        "direction": "up",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.12375,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.5
+            ],
+            "heights": [
+              0.13,
+              0.13,
+              0.115,
+              0.12
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 2.5,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1233058892,
+        "direction": "up",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.1255,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              4.0,
+              4.3500000000000005
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              4.0,
+              4.3500000000000005,
+              4.75
+            ],
+            "heights": [
+              0.12,
+              0.12,
+              0.125,
+              0.125,
+              0.13,
+              0.13,
+              0.12,
+              0.12,
+              0.13,
+              0.135
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 4.75,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1991049240,
+        "direction": "up",
+        "num_steps": 9,
+        "width_m": 1.5,
+        "riser_height_m": 0.13666666666666666,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.95
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.95,
+              4.3
+            ],
+            "heights": [
+              0.13,
+              0.15,
+              0.13,
+              0.14,
+              0.13,
+              0.135,
+              0.145,
+              0.135,
+              0.135
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 4.3,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 450152621,
+        "direction": "up",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.14125000000000001,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.55,
+              1.9000000000000001
+            ],
+            "ends": [
+              1.25,
+              1.55,
+              1.9000000000000001,
+              2.2
+            ],
+            "heights": [
+              0.13,
+              0.145,
+              0.16,
+              0.13
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 2.2,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1907219570,
+        "direction": "up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.15125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.75,
+              3.1500000000000004,
+              3.5
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.75,
+              3.1500000000000004,
+              3.5,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.16,
+              0.14,
+              0.145,
+              0.14,
+              0.16,
+              0.165,
+              0.155,
+              0.145
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.9000000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 875079008,
+        "direction": "up",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.1675,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004
+            ],
+            "heights": [
+              0.18,
+              0.17,
+              0.165,
+              0.155
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 2.4000000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1189900291,
+        "direction": "up",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.179,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.5,
+              1.8,
+              2.1
+            ],
+            "ends": [
+              1.25,
+              1.5,
+              1.8,
+              2.1,
+              2.4000000000000004
+            ],
+            "heights": [
+              0.18,
+              0.17,
+              0.19,
+              0.165,
+              0.19
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 2.4000000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1609096917,
+        "direction": "up",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.18857142857142858,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              3.0
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.17,
+              0.19,
+              0.195,
+              0.19,
+              0.2,
+              0.2
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.0,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1527167700,
+        "direction": "up",
+        "num_steps": 6,
+        "width_m": 4.0,
+        "riser_height_m": 0.19166666666666668,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.85
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.85,
+              3.2
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.2,
+              0.195,
+              0.18,
+              0.2,
+              0.2
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 3.2,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      }
+    ],
+    "down": [
+      {
+        "seed": 549260787,
+        "direction": "down",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.010416666666666668,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.6,
+              1.85,
+              2.15,
+              2.45,
+              2.7,
+              2.95,
+              3.2,
+              3.5,
+              3.85,
+              4.15
+            ],
+            "ends": [
+              1.25,
+              1.6,
+              1.85,
+              2.15,
+              2.45,
+              2.7,
+              2.95,
+              3.2,
+              3.5,
+              3.85,
+              4.15,
+              4.45
+            ],
+            "heights": [
+              0.01,
+              0.01,
+              0.01,
+              0.01,
+              0.015,
+              0.01,
+              0.01,
+              0.01,
+              0.01,
+              0.01,
+              0.01,
+              0.01
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 4.45,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 2068067855,
+        "direction": "down",
+        "num_steps": 9,
+        "width_m": 4.0,
+        "riser_height_m": 0.025,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.55,
+              1.8,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.25
+            ],
+            "ends": [
+              1.25,
+              1.55,
+              1.8,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.25,
+              3.5
+            ],
+            "heights": [
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.025
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 3.5,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1316683214,
+        "direction": "down",
+        "num_steps": 9,
+        "width_m": 4.0,
+        "riser_height_m": 0.029444444444444447,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.95,
+              3.35,
+              3.7,
+              4.1000000000000005
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.95,
+              3.35,
+              3.7,
+              4.1000000000000005,
+              4.45
+            ],
+            "heights": [
+              0.03,
+              0.03,
+              0.03,
+              0.025,
+              0.035,
+              0.03,
+              0.03,
+              0.025,
+              0.03
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 4.45,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1406861771,
+        "direction": "down",
+        "num_steps": 11,
+        "width_m": 4.0,
+        "riser_height_m": 0.03954545454545454,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.75,
+              3.0,
+              3.25,
+              3.5500000000000003,
+              3.8000000000000003
+            ],
+            "ends": [
+              1.25,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.75,
+              3.0,
+              3.25,
+              3.5500000000000003,
+              3.8000000000000003,
+              4.1000000000000005
+            ],
+            "heights": [
+              0.045,
+              0.035,
+              0.04,
+              0.045,
+              0.035,
+              0.04,
+              0.035,
+              0.04,
+              0.04,
+              0.04,
+              0.04
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 4.1000000000000005,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1092418183,
+        "direction": "down",
+        "num_steps": 9,
+        "width_m": 4.0,
+        "riser_height_m": 0.05111111111111111,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.85,
+              2.15,
+              2.45,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.4000000000000004
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.85,
+              2.15,
+              2.45,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.4000000000000004,
+              3.7
+            ],
+            "heights": [
+              0.05,
+              0.05,
+              0.05,
+              0.05,
+              0.05,
+              0.055,
+              0.05,
+              0.05,
+              0.055
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 3.7,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1252670261,
+        "direction": "down",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.063125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.8,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              2.95
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.8,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.25
+            ],
+            "heights": [
+              0.06,
+              0.06,
+              0.065,
+              0.065,
+              0.07,
+              0.06,
+              0.06,
+              0.065
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 3.25,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 360202605,
+        "direction": "down",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.07041666666666667,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              3.0500000000000003,
+              3.4000000000000004,
+              3.7,
+              4.0,
+              4.25
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              3.0500000000000003,
+              3.4000000000000004,
+              3.7,
+              4.0,
+              4.25,
+              4.6000000000000005
+            ],
+            "heights": [
+              0.065,
+              0.075,
+              0.07,
+              0.075,
+              0.075,
+              0.065,
+              0.07,
+              0.075,
+              0.065,
+              0.07,
+              0.07,
+              0.07
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 4.6000000000000005,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1537421868,
+        "direction": "down",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.083,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.45
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003
+            ],
+            "heights": [
+              0.08,
+              0.085,
+              0.085,
+              0.085,
+              0.08
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 2.8000000000000003,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1487200419,
+        "direction": "down",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.0925,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6500000000000001,
+              1.9500000000000002,
+              2.25,
+              2.5,
+              2.75,
+              3.0500000000000003,
+              3.4000000000000004,
+              3.7
+            ],
+            "ends": [
+              1.35,
+              1.6500000000000001,
+              1.9500000000000002,
+              2.25,
+              2.5,
+              2.75,
+              3.0500000000000003,
+              3.4000000000000004,
+              3.7,
+              4.0
+            ],
+            "heights": [
+              0.095,
+              0.095,
+              0.085,
+              0.09,
+              0.1,
+              0.1,
+              0.1,
+              0.085,
+              0.085,
+              0.09
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 4.0,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 841115226,
+        "direction": "down",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.1,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.95,
+              4.3500000000000005,
+              4.7,
+              5.050000000000001
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.95,
+              4.3500000000000005,
+              4.7,
+              5.050000000000001,
+              5.4
+            ],
+            "heights": [
+              0.11,
+              0.095,
+              0.105,
+              0.105,
+              0.095,
+              0.105,
+              0.105,
+              0.105,
+              0.095,
+              0.09,
+              0.09,
+              0.1
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 5.4,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 683208708,
+        "direction": "down",
+        "num_steps": 11,
+        "width_m": 4.0,
+        "riser_height_m": 0.11,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              3.95,
+              4.3,
+              4.7
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              3.95,
+              4.3,
+              4.7,
+              5.1000000000000005
+            ],
+            "heights": [
+              0.105,
+              0.115,
+              0.115,
+              0.115,
+              0.1,
+              0.115,
+              0.115,
+              0.115,
+              0.11,
+              0.105,
+              0.1
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 5.1000000000000005,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1162669085,
+        "direction": "down",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.11928571428571429,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.15,
+              2.45,
+              2.7
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.15,
+              2.45,
+              2.7,
+              2.95
+            ],
+            "heights": [
+              0.13,
+              0.11,
+              0.13,
+              0.115,
+              0.11,
+              0.12,
+              0.12
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 2.95,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 636300172,
+        "direction": "down",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.129,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.8,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              3.95,
+              4.3
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.8,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              3.95,
+              4.3,
+              4.65
+            ],
+            "heights": [
+              0.12,
+              0.13,
+              0.135,
+              0.14,
+              0.13,
+              0.12,
+              0.125,
+              0.13,
+              0.12,
+              0.14
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 4.65,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1040453555,
+        "direction": "down",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.13125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.9000000000000001
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2
+            ],
+            "heights": [
+              0.135,
+              0.14,
+              0.125,
+              0.125
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 2.2,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1257265993,
+        "direction": "down",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.14375000000000002,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003,
+              3.1
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003,
+              3.1,
+              3.4000000000000004
+            ],
+            "heights": [
+              0.155,
+              0.15,
+              0.135,
+              0.13,
+              0.135,
+              0.16,
+              0.135,
+              0.15
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 3.4000000000000004,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1812026434,
+        "direction": "down",
+        "num_steps": 12,
+        "width_m": 4.0,
+        "riser_height_m": 0.16583333333333333,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.75,
+              3.1,
+              3.45,
+              3.8000000000000003,
+              4.2,
+              4.6000000000000005,
+              5.0
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.75,
+              3.1,
+              3.45,
+              3.8000000000000003,
+              4.2,
+              4.6000000000000005,
+              5.0,
+              5.3500000000000005
+            ],
+            "heights": [
+              0.16,
+              0.155,
+              0.17,
+              0.155,
+              0.155,
+              0.17500000000000002,
+              0.17,
+              0.17500000000000002,
+              0.17500000000000002,
+              0.17,
+              0.165,
+              0.165
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 5.3500000000000005,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1078627882,
+        "direction": "down",
+        "num_steps": 11,
+        "width_m": 4.0,
+        "riser_height_m": 0.16818181818181818,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004,
+              3.3000000000000003,
+              3.6500000000000004,
+              4.0,
+              4.3500000000000005,
+              4.7
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004,
+              3.3000000000000003,
+              3.6500000000000004,
+              4.0,
+              4.3500000000000005,
+              4.7,
+              5.1000000000000005
+            ],
+            "heights": [
+              0.18,
+              0.17500000000000002,
+              0.18,
+              0.165,
+              0.18,
+              0.17500000000000002,
+              0.16,
+              0.155,
+              0.16,
+              0.16,
+              0.16
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 5.1000000000000005,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 427989927,
+        "direction": "down",
+        "num_steps": 6,
+        "width_m": 4.0,
+        "riser_height_m": 0.1733333333333333,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.9500000000000002,
+              2.25,
+              2.5
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.9500000000000002,
+              2.25,
+              2.5,
+              2.75
+            ],
+            "heights": [
+              0.155,
+              0.17500000000000002,
+              0.16,
+              0.185,
+              0.185,
+              0.18
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 2.75,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1958199453,
+        "direction": "down",
+        "num_steps": 9,
+        "width_m": 4.0,
+        "riser_height_m": 0.18611111111111112,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.9500000000000002,
+              2.25,
+              2.6,
+              2.85,
+              3.1500000000000004,
+              3.45
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.9500000000000002,
+              2.25,
+              2.6,
+              2.85,
+              3.1500000000000004,
+              3.45,
+              3.7
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.2,
+              0.18,
+              0.17500000000000002,
+              0.2,
+              0.2,
+              0.195,
+              0.17,
+              0.18
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 3.7,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 631197532,
+        "direction": "down",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.189,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.8000000000000003
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.19,
+              0.195,
+              0.2,
+              0.185
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 2.8000000000000003,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      }
+    ],
+    "up_down": [
+      {
+        "seed": 1027177638,
+        "direction": "up_down",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.013125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004,
+              3.25,
+              3.6
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              3.95
+            ],
+            "heights": [
+              0.015,
+              0.01,
+              0.015,
+              0.01,
+              0.015,
+              0.015,
+              0.01,
+              0.015
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.25,
+              5.6000000000000005,
+              5.95,
+              6.300000000000001,
+              6.7,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.6000000000000005,
+              5.95,
+              6.300000000000001,
+              6.7,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.015,
+              0.01,
+              0.015,
+              0.015,
+              0.01,
+              0.015,
+              0.01,
+              0.015
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1233537732,
+        "direction": "up_down",
+        "num_steps": 5,
+        "width_m": 1.5,
+        "riser_height_m": 0.02,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.75
+            ],
+            "heights": [
+              0.02,
+              0.02,
+              0.02,
+              0.02,
+              0.02
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.45,
+              6.800000000000001,
+              7.15,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.800000000000001,
+              7.15,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.02,
+              0.02,
+              0.02,
+              0.02,
+              0.02
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 700559671,
+        "direction": "up_down",
+        "num_steps": 10,
+        "width_m": 1.0,
+        "riser_height_m": 0.036000000000000004,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.45,
+              2.7,
+              3.0,
+              3.3000000000000003,
+              3.6
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.45,
+              2.7,
+              3.0,
+              3.3000000000000003,
+              3.6,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.035,
+              0.04,
+              0.04,
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.035
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.300000000000001,
+              5.6000000000000005,
+              5.9,
+              6.2,
+              6.5,
+              6.75,
+              7.0,
+              7.300000000000001,
+              7.6000000000000005,
+              7.9
+            ],
+            "ends": [
+              5.6000000000000005,
+              5.9,
+              6.2,
+              6.5,
+              6.75,
+              7.0,
+              7.300000000000001,
+              7.6000000000000005,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.035,
+              0.04,
+              0.04,
+              0.035
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1318892701,
+        "direction": "up_down",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.048125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.85,
+              2.15,
+              2.4000000000000004,
+              2.7,
+              2.95
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.85,
+              2.15,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.3000000000000003
+            ],
+            "heights": [
+              0.045,
+              0.05,
+              0.05,
+              0.05,
+              0.045,
+              0.05,
+              0.045,
+              0.05
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.9,
+              6.25,
+              6.5,
+              6.800000000000001,
+              7.050000000000001,
+              7.3500000000000005,
+              7.6000000000000005,
+              7.9
+            ],
+            "ends": [
+              6.25,
+              6.5,
+              6.800000000000001,
+              7.050000000000001,
+              7.3500000000000005,
+              7.6000000000000005,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.05,
+              0.045,
+              0.05,
+              0.045,
+              0.05,
+              0.05,
+              0.05,
+              0.045
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1675640649,
+        "direction": "up_down",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.054000000000000006,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.2
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.2,
+              2.5
+            ],
+            "heights": [
+              0.055,
+              0.055,
+              0.05,
+              0.05,
+              0.06
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.7,
+              7.0,
+              7.3500000000000005,
+              7.65,
+              7.9
+            ],
+            "ends": [
+              7.0,
+              7.3500000000000005,
+              7.65,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.06,
+              0.05,
+              0.05,
+              0.055,
+              0.055
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1666515282,
+        "direction": "up_down",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.060625,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.15,
+              2.5,
+              2.85,
+              3.2,
+              3.5500000000000003
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.15,
+              2.5,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.06,
+              0.065,
+              0.06,
+              0.06,
+              0.055,
+              0.06,
+              0.06,
+              0.065
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.300000000000001,
+              5.65,
+              6.0,
+              6.3500000000000005,
+              6.7,
+              7.050000000000001,
+              7.45,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.65,
+              6.0,
+              6.3500000000000005,
+              6.7,
+              7.050000000000001,
+              7.45,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.065,
+              0.06,
+              0.06,
+              0.055,
+              0.06,
+              0.06,
+              0.065,
+              0.06
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 158524869,
+        "direction": "up_down",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.06875,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0,
+              2.25
+            ],
+            "heights": [
+              0.075,
+              0.065,
+              0.065,
+              0.07
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.95,
+              7.2,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              7.2,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.07,
+              0.065,
+              0.065,
+              0.075
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 928281942,
+        "direction": "up_down",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.07785714285714286,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004,
+              3.3000000000000003
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004,
+              3.3000000000000003,
+              3.6500000000000004
+            ],
+            "heights": [
+              0.085,
+              0.08,
+              0.075,
+              0.075,
+              0.075,
+              0.075,
+              0.08
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.550000000000001,
+              5.9,
+              6.300000000000001,
+              6.7,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              5.9,
+              6.300000000000001,
+              6.7,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.08,
+              0.075,
+              0.075,
+              0.075,
+              0.075,
+              0.08,
+              0.085
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 457800709,
+        "direction": "up_down",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.092,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6500000000000001,
+              1.9000000000000001,
+              2.15,
+              2.45,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.35,
+              3.6500000000000004
+            ],
+            "ends": [
+              1.35,
+              1.6500000000000001,
+              1.9000000000000001,
+              2.15,
+              2.45,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.35,
+              3.6500000000000004,
+              3.95
+            ],
+            "heights": [
+              0.09,
+              0.1,
+              0.105,
+              0.1,
+              0.085,
+              0.1,
+              0.085,
+              0.085,
+              0.085,
+              0.085
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.25,
+              5.550000000000001,
+              5.8500000000000005,
+              6.15,
+              6.4,
+              6.75,
+              7.050000000000001,
+              7.300000000000001,
+              7.550000000000001,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.550000000000001,
+              5.8500000000000005,
+              6.15,
+              6.4,
+              6.75,
+              7.050000000000001,
+              7.300000000000001,
+              7.550000000000001,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.085,
+              0.085,
+              0.085,
+              0.085,
+              0.1,
+              0.085,
+              0.1,
+              0.105,
+              0.1,
+              0.09
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 678615539,
+        "direction": "up_down",
+        "num_steps": 10,
+        "width_m": 4.0,
+        "riser_height_m": 0.099,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6500000000000001,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.3000000000000003,
+              3.6
+            ],
+            "ends": [
+              1.35,
+              1.6500000000000001,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003,
+              3.0500000000000003,
+              3.3000000000000003,
+              3.6,
+              3.95
+            ],
+            "heights": [
+              0.09,
+              0.105,
+              0.1,
+              0.105,
+              0.11,
+              0.095,
+              0.095,
+              0.09,
+              0.105,
+              0.095
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.25,
+              5.6000000000000005,
+              5.9,
+              6.15,
+              6.4,
+              6.7,
+              7.0,
+              7.300000000000001,
+              7.550000000000001,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.6000000000000005,
+              5.9,
+              6.15,
+              6.4,
+              6.7,
+              7.0,
+              7.300000000000001,
+              7.550000000000001,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.095,
+              0.105,
+              0.09,
+              0.095,
+              0.095,
+              0.11,
+              0.105,
+              0.1,
+              0.105,
+              0.09
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 256334513,
+        "direction": "up_down",
+        "num_steps": 6,
+        "width_m": 4.0,
+        "riser_height_m": 0.10333333333333335,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.1,
+              2.35
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.1,
+              2.35,
+              2.6
+            ],
+            "heights": [
+              0.105,
+              0.095,
+              0.105,
+              0.11,
+              0.1,
+              0.105
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.6000000000000005,
+              6.8500000000000005,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.65,
+              7.9
+            ],
+            "ends": [
+              6.8500000000000005,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.65,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.105,
+              0.1,
+              0.11,
+              0.105,
+              0.095,
+              0.105
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1521926516,
+        "direction": "up_down",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.122,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.85
+            ],
+            "heights": [
+              0.125,
+              0.12,
+              0.12,
+              0.125,
+              0.12
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.75,
+              7.1000000000000005,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.12,
+              0.125,
+              0.12,
+              0.12,
+              0.125
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1189476410,
+        "direction": "up_down",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.12642857142857142,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.8000000000000003,
+              3.2
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.4000000000000004,
+              2.8000000000000003,
+              3.2,
+              3.6
+            ],
+            "heights": [
+              0.14,
+              0.115,
+              0.115,
+              0.135,
+              0.12,
+              0.135,
+              0.125
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.6000000000000005,
+              6.0,
+              6.4,
+              6.800000000000001,
+              7.15,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.0,
+              6.4,
+              6.800000000000001,
+              7.15,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.125,
+              0.135,
+              0.12,
+              0.135,
+              0.115,
+              0.115,
+              0.14
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 873194435,
+        "direction": "up_down",
+        "num_steps": 9,
+        "width_m": 4.0,
+        "riser_height_m": 0.1361111111111111,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.55,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.75,
+              3.0500000000000003,
+              3.35
+            ],
+            "ends": [
+              1.25,
+              1.55,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.75,
+              3.0500000000000003,
+              3.35,
+              3.6500000000000004
+            ],
+            "heights": [
+              0.14,
+              0.145,
+              0.135,
+              0.125,
+              0.125,
+              0.145,
+              0.15,
+              0.13,
+              0.13
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.550000000000001,
+              5.8500000000000005,
+              6.15,
+              6.45,
+              6.800000000000001,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.65,
+              7.95
+            ],
+            "ends": [
+              5.8500000000000005,
+              6.15,
+              6.45,
+              6.800000000000001,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.65,
+              7.95,
+              8.200000000000001
+            ],
+            "heights": [
+              0.13,
+              0.13,
+              0.15,
+              0.145,
+              0.125,
+              0.125,
+              0.135,
+              0.145,
+              0.14
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 651248695,
+        "direction": "up_down",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.15375,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6,
+              1.9500000000000002
+            ],
+            "ends": [
+              1.35,
+              1.6,
+              1.9500000000000002,
+              2.3000000000000003
+            ],
+            "heights": [
+              0.135,
+              0.16,
+              0.16,
+              0.16
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.9,
+              7.25,
+              7.6000000000000005,
+              7.8500000000000005
+            ],
+            "ends": [
+              7.25,
+              7.6000000000000005,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.16,
+              0.16,
+              0.16,
+              0.135
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1851722579,
+        "direction": "up_down",
+        "num_steps": 6,
+        "width_m": 4.0,
+        "riser_height_m": 0.16666666666666669,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.85,
+              2.1,
+              2.4000000000000004
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7
+            ],
+            "heights": [
+              0.17,
+              0.17,
+              0.15,
+              0.165,
+              0.17,
+              0.17500000000000002
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.5,
+              6.800000000000001,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.6000000000000005,
+              7.9
+            ],
+            "ends": [
+              6.800000000000001,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.6000000000000005,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.17,
+              0.165,
+              0.15,
+              0.17,
+              0.17
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1349724428,
+        "direction": "up_down",
+        "num_steps": 4,
+        "width_m": 4.0,
+        "riser_height_m": 0.1675,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.8,
+              2.15
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.8,
+              2.15,
+              2.5500000000000003
+            ],
+            "heights": [
+              0.16,
+              0.18,
+              0.17500000000000002,
+              0.155
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.65,
+              7.050000000000001,
+              7.4,
+              7.800000000000001
+            ],
+            "ends": [
+              7.050000000000001,
+              7.4,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.155,
+              0.17500000000000002,
+              0.18,
+              0.16
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1922892882,
+        "direction": "up_down",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.176875,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.2,
+              3.6
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.2,
+              3.6,
+              3.95
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.18,
+              0.17,
+              0.17500000000000002,
+              0.18,
+              0.17,
+              0.19,
+              0.17500000000000002
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              5.25,
+              5.6000000000000005,
+              6.0,
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.6000000000000005,
+              6.0,
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.17500000000000002,
+              0.19,
+              0.17,
+              0.18,
+              0.17500000000000002,
+              0.17,
+              0.18,
+              0.17500000000000002
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1904109614,
+        "direction": "up_down",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.185,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003
+            ],
+            "heights": [
+              0.17,
+              0.195,
+              0.17500000000000002,
+              0.19,
+              0.195
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.195,
+              0.19,
+              0.17500000000000002,
+              0.195,
+              0.17
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1147252386,
+        "direction": "up_down",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.192,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.45
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.45,
+              2.8000000000000003
+            ],
+            "heights": [
+              0.2,
+              0.2,
+              0.18,
+              0.2,
+              0.18
+            ],
+            "direction": 1
+          },
+          {
+            "starts": [
+              6.4,
+              6.75,
+              7.15,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.75,
+              7.15,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.18,
+              0.2,
+              0.18,
+              0.2,
+              0.2
+            ],
+            "direction": -1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      }
+    ],
+    "down_up": [
+      {
+        "seed": 1206567758,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.01625,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.25,
+              3.6500000000000004
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.25,
+              3.6500000000000004,
+              4.0
+            ],
+            "heights": [
+              0.015,
+              0.015,
+              0.015,
+              0.015,
+              0.02,
+              0.015,
+              0.02,
+              0.015
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.2,
+              5.550000000000001,
+              5.95,
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.550000000000001,
+              5.95,
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.015,
+              0.02,
+              0.015,
+              0.02,
+              0.015,
+              0.015,
+              0.015,
+              0.015
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 922066542,
+        "direction": "down_up",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.026000000000000002,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003
+            ],
+            "heights": [
+              0.025,
+              0.025,
+              0.025,
+              0.025,
+              0.03
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.03,
+              0.025,
+              0.025,
+              0.025,
+              0.025
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 410462965,
+        "direction": "down_up",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.03142857142857143,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0,
+              2.35,
+              2.7,
+              3.0
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0,
+              2.35,
+              2.7,
+              3.0,
+              3.3000000000000003
+            ],
+            "heights": [
+              0.03,
+              0.035,
+              0.035,
+              0.03,
+              0.03,
+              0.03,
+              0.03
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.9,
+              6.2,
+              6.5,
+              6.8500000000000005,
+              7.2,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.2,
+              6.5,
+              6.8500000000000005,
+              7.2,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.03,
+              0.03,
+              0.03,
+              0.03,
+              0.035,
+              0.035,
+              0.03
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1430105220,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.043750000000000004,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5500000000000003
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5500000000000003,
+              3.95
+            ],
+            "heights": [
+              0.045,
+              0.04,
+              0.045,
+              0.045,
+              0.045,
+              0.045,
+              0.045,
+              0.04
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.25,
+              5.65,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.15,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.65,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.15,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.04,
+              0.045,
+              0.045,
+              0.045,
+              0.045,
+              0.045,
+              0.04,
+              0.045
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1356374191,
+        "direction": "down_up",
+        "num_steps": 11,
+        "width_m": 1.5,
+        "riser_height_m": 0.04863636363636364,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.85,
+              2.2,
+              2.45,
+              2.7,
+              3.0,
+              3.25,
+              3.5,
+              3.75
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.85,
+              2.2,
+              2.45,
+              2.7,
+              3.0,
+              3.25,
+              3.5,
+              3.75,
+              4.05
+            ],
+            "heights": [
+              0.045,
+              0.05,
+              0.055,
+              0.05,
+              0.045,
+              0.05,
+              0.045,
+              0.045,
+              0.05,
+              0.045,
+              0.055
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.15,
+              5.45,
+              5.7,
+              5.95,
+              6.2,
+              6.5,
+              6.75,
+              7.0,
+              7.3500000000000005,
+              7.65,
+              7.9
+            ],
+            "ends": [
+              5.45,
+              5.7,
+              5.95,
+              6.2,
+              6.5,
+              6.75,
+              7.0,
+              7.3500000000000005,
+              7.65,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.055,
+              0.045,
+              0.05,
+              0.045,
+              0.045,
+              0.05,
+              0.045,
+              0.05,
+              0.055,
+              0.05,
+              0.045
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 527588397,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.060625,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.6500000000000001,
+              1.9500000000000002,
+              2.25,
+              2.5500000000000003,
+              2.85,
+              3.1
+            ],
+            "ends": [
+              1.35,
+              1.6500000000000001,
+              1.9500000000000002,
+              2.25,
+              2.5500000000000003,
+              2.85,
+              3.1,
+              3.45
+            ],
+            "heights": [
+              0.06,
+              0.06,
+              0.055,
+              0.06,
+              0.06,
+              0.06,
+              0.06,
+              0.07
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.75,
+              6.1000000000000005,
+              6.3500000000000005,
+              6.65,
+              6.95,
+              7.25,
+              7.550000000000001,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.1000000000000005,
+              6.3500000000000005,
+              6.65,
+              6.95,
+              7.25,
+              7.550000000000001,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.07,
+              0.06,
+              0.06,
+              0.06,
+              0.06,
+              0.055,
+              0.06,
+              0.06
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 145716385,
+        "direction": "down_up",
+        "num_steps": 11,
+        "width_m": 4.0,
+        "riser_height_m": 0.06863636363636363,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.5,
+              1.75,
+              2.0500000000000003,
+              2.3000000000000003,
+              2.6,
+              2.9000000000000004,
+              3.25,
+              3.5,
+              3.85
+            ],
+            "ends": [
+              1.25,
+              1.5,
+              1.75,
+              2.0500000000000003,
+              2.3000000000000003,
+              2.6,
+              2.9000000000000004,
+              3.25,
+              3.5,
+              3.85,
+              4.1000000000000005
+            ],
+            "heights": [
+              0.065,
+              0.07,
+              0.07,
+              0.075,
+              0.075,
+              0.065,
+              0.07,
+              0.075,
+              0.065,
+              0.065,
+              0.06
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.1000000000000005,
+              5.3500000000000005,
+              5.7,
+              5.95,
+              6.300000000000001,
+              6.6000000000000005,
+              6.9,
+              7.15,
+              7.45,
+              7.7,
+              7.95
+            ],
+            "ends": [
+              5.3500000000000005,
+              5.7,
+              5.95,
+              6.300000000000001,
+              6.6000000000000005,
+              6.9,
+              7.15,
+              7.45,
+              7.7,
+              7.95,
+              8.200000000000001
+            ],
+            "heights": [
+              0.06,
+              0.065,
+              0.065,
+              0.075,
+              0.07,
+              0.065,
+              0.075,
+              0.075,
+              0.07,
+              0.07,
+              0.065
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1129937240,
+        "direction": "down_up",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.07857142857142857,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5
+            ],
+            "heights": [
+              0.075,
+              0.08,
+              0.08,
+              0.085,
+              0.075,
+              0.08,
+              0.075
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.7,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005
+            ],
+            "ends": [
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.075,
+              0.08,
+              0.075,
+              0.085,
+              0.08,
+              0.08,
+              0.075
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1270416916,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.08625000000000001,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003
+            ],
+            "ends": [
+              1.35,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.08,
+              0.08,
+              0.09,
+              0.095,
+              0.09,
+              0.08,
+              0.09,
+              0.085
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.300000000000001,
+              5.65,
+              6.0,
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.65,
+              6.0,
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.085,
+              0.09,
+              0.08,
+              0.09,
+              0.095,
+              0.09,
+              0.08,
+              0.08
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 531161225,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.10125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003,
+              3.1500000000000004
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.45
+            ],
+            "heights": [
+              0.105,
+              0.09,
+              0.105,
+              0.1,
+              0.1,
+              0.105,
+              0.105,
+              0.1
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.75,
+              6.050000000000001,
+              6.4,
+              6.7,
+              7.0,
+              7.300000000000001,
+              7.6000000000000005,
+              7.9
+            ],
+            "ends": [
+              6.050000000000001,
+              6.4,
+              6.7,
+              7.0,
+              7.300000000000001,
+              7.6000000000000005,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.1,
+              0.105,
+              0.105,
+              0.1,
+              0.1,
+              0.105,
+              0.09,
+              0.105
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 897899418,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.111875,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5500000000000003
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.1,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5500000000000003,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.115,
+              0.105,
+              0.11,
+              0.105,
+              0.11,
+              0.12,
+              0.115,
+              0.115
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.300000000000001,
+              5.65,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.65,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.1000000000000005,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.115,
+              0.115,
+              0.12,
+              0.11,
+              0.105,
+              0.11,
+              0.105,
+              0.115
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1623365870,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.124375,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45,
+              2.85,
+              3.2,
+              3.5500000000000003,
+              3.9000000000000004
+            ],
+            "heights": [
+              0.135,
+              0.13,
+              0.135,
+              0.115,
+              0.115,
+              0.115,
+              0.13,
+              0.12
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.300000000000001,
+              5.65,
+              6.0,
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              5.65,
+              6.0,
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.12,
+              0.13,
+              0.115,
+              0.115,
+              0.115,
+              0.135,
+              0.13,
+              0.135
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1222830594,
+        "direction": "down_up",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.129,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.45,
+              2.85
+            ],
+            "heights": [
+              0.12,
+              0.13,
+              0.135,
+              0.14,
+              0.12
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              6.3500000000000005,
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              6.75,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.12,
+              0.14,
+              0.135,
+              0.13,
+              0.12
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1014615208,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.139375,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004,
+              3.25,
+              3.6
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.1,
+              2.5,
+              2.9000000000000004,
+              3.25,
+              3.6,
+              3.95
+            ],
+            "heights": [
+              0.145,
+              0.145,
+              0.145,
+              0.14,
+              0.14,
+              0.135,
+              0.125,
+              0.14
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.25,
+              5.6000000000000005,
+              5.95,
+              6.300000000000001,
+              6.7,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              5.6000000000000005,
+              5.95,
+              6.300000000000001,
+              6.7,
+              7.1000000000000005,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.14,
+              0.125,
+              0.135,
+              0.14,
+              0.14,
+              0.145,
+              0.145,
+              0.145
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 2062390879,
+        "direction": "down_up",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.14800000000000002,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.8,
+              2.1
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.8,
+              2.1,
+              2.35
+            ],
+            "heights": [
+              0.155,
+              0.165,
+              0.145,
+              0.135,
+              0.14
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              6.8500000000000005,
+              7.1000000000000005,
+              7.4,
+              7.65,
+              7.9
+            ],
+            "ends": [
+              7.1000000000000005,
+              7.4,
+              7.65,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.14,
+              0.135,
+              0.145,
+              0.165,
+              0.155
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1996110775,
+        "direction": "down_up",
+        "num_steps": 7,
+        "width_m": 4.0,
+        "riser_height_m": 0.1635714285714286,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.55,
+              1.8,
+              2.1,
+              2.4000000000000004,
+              2.6500000000000004
+            ],
+            "ends": [
+              1.3,
+              1.55,
+              1.8,
+              2.1,
+              2.4000000000000004,
+              2.6500000000000004,
+              2.95
+            ],
+            "heights": [
+              0.17,
+              0.17,
+              0.15,
+              0.165,
+              0.17,
+              0.165,
+              0.155
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              6.25,
+              6.550000000000001,
+              6.800000000000001,
+              7.1000000000000005,
+              7.4,
+              7.65,
+              7.9
+            ],
+            "ends": [
+              6.550000000000001,
+              6.800000000000001,
+              7.1000000000000005,
+              7.4,
+              7.65,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.155,
+              0.165,
+              0.17,
+              0.165,
+              0.15,
+              0.17,
+              0.17
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 187219305,
+        "direction": "down_up",
+        "num_steps": 6,
+        "width_m": 4.0,
+        "riser_height_m": 0.1733333333333333,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.25,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5
+            ],
+            "ends": [
+              1.25,
+              1.6,
+              1.9000000000000001,
+              2.2,
+              2.5,
+              2.8000000000000003
+            ],
+            "heights": [
+              0.185,
+              0.18,
+              0.16,
+              0.18,
+              0.18,
+              0.155
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              6.4,
+              6.7,
+              7.0,
+              7.300000000000001,
+              7.6000000000000005,
+              7.95
+            ],
+            "ends": [
+              6.7,
+              7.0,
+              7.300000000000001,
+              7.6000000000000005,
+              7.95,
+              8.200000000000001
+            ],
+            "heights": [
+              0.155,
+              0.18,
+              0.18,
+              0.16,
+              0.18,
+              0.185
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 1002158762,
+        "direction": "down_up",
+        "num_steps": 5,
+        "width_m": 4.0,
+        "riser_height_m": 0.174,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5500000000000003
+            ],
+            "ends": [
+              1.4000000000000001,
+              1.75,
+              2.15,
+              2.5500000000000003,
+              2.9000000000000004
+            ],
+            "heights": [
+              0.185,
+              0.185,
+              0.16,
+              0.17,
+              0.17
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              6.300000000000001,
+              6.65,
+              7.050000000000001,
+              7.45,
+              7.800000000000001
+            ],
+            "ends": [
+              6.65,
+              7.050000000000001,
+              7.45,
+              7.800000000000001,
+              8.200000000000001
+            ],
+            "heights": [
+              0.17,
+              0.17,
+              0.16,
+              0.185,
+              0.185
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 886684139,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.185625,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.3,
+              1.6,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              2.95
+            ],
+            "ends": [
+              1.3,
+              1.6,
+              1.85,
+              2.1,
+              2.4000000000000004,
+              2.7,
+              2.95,
+              3.25
+            ],
+            "heights": [
+              0.19,
+              0.18,
+              0.2,
+              0.17500000000000002,
+              0.17500000000000002,
+              0.19,
+              0.185,
+              0.19
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.95,
+              6.25,
+              6.5,
+              6.800000000000001,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.6000000000000005,
+              7.9
+            ],
+            "ends": [
+              6.25,
+              6.5,
+              6.800000000000001,
+              7.1000000000000005,
+              7.3500000000000005,
+              7.6000000000000005,
+              7.9,
+              8.200000000000001
+            ],
+            "heights": [
+              0.19,
+              0.185,
+              0.19,
+              0.17500000000000002,
+              0.17500000000000002,
+              0.2,
+              0.18,
+              0.19
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      },
+      {
+        "seed": 817979542,
+        "direction": "down_up",
+        "num_steps": 8,
+        "width_m": 4.0,
+        "riser_height_m": 0.193125,
+        "runs": [
+          {
+            "starts": [
+              1.0,
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5500000000000003
+            ],
+            "ends": [
+              1.35,
+              1.7000000000000002,
+              2.0500000000000003,
+              2.45,
+              2.8000000000000003,
+              3.1500000000000004,
+              3.5500000000000003,
+              3.95
+            ],
+            "heights": [
+              0.2,
+              0.195,
+              0.2,
+              0.18,
+              0.17500000000000002,
+              0.195,
+              0.2,
+              0.2
+            ],
+            "direction": -1
+          },
+          {
+            "starts": [
+              5.25,
+              5.65,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.15,
+              7.5,
+              7.8500000000000005
+            ],
+            "ends": [
+              5.65,
+              6.050000000000001,
+              6.4,
+              6.75,
+              7.15,
+              7.5,
+              7.8500000000000005,
+              8.200000000000001
+            ],
+            "heights": [
+              0.2,
+              0.2,
+              0.195,
+              0.17500000000000002,
+              0.18,
+              0.2,
+              0.195,
+              0.2
+            ],
+            "direction": 1
+          }
+        ],
+        "end_m": 8.200000000000001,
+        "spawn_origin_x": 0.2,
+        "extent": 9.2
+      }
+    ]
+  },
+  "deviations": [
+    "MuJoCo contact solver differs from PhysX.",
+    "Nominal inertias/friction; training randomization and visual noise are not reproduced.",
+    "Fixed equivalent command delay is adjustable, rather than randomized motor/control delay.",
+    "Preview is a sim-to-sim experiment, not gait or deployment acceptance."
+  ]
+}

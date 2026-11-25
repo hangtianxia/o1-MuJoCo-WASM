@@ -1,0 +1,81 @@
+{
+  "checkpoint": {
+    "iteration": 16175,
+    "path": "/home/ubuntu/workspace/instinct-ssr-stair-audited-fromzero-20261012/outputs/source_snapshots/bd961d3e3f21a8442dd008234503dcc9bbdacfa7/external_worktrees/instinctlab_stage4/logs/instinct_rl/o1_parkour_stair_audit/20261020_063953_stair_audit_fromzero_seed_0_geometry_0_stage_18_from20261020_062741/latest.pt",
+    "sha256": "1d679b4a1563b3db9bbea121495abf450a944d04087a3dbd67b23873ee0434c8",
+    "source_sha": "bd961d3e3f21a8442dd008234503dcc9bbdacfa7",
+    "run_dir": "/home/ubuntu/workspace/instinct-ssr-stair-audited-fromzero-20261012/outputs/source_snapshots/bd961d3e3f21a8442dd008234503dcc9bbdacfa7/external_worktrees/instinctlab_stage4/logs/instinct_rl/o1_parkour_stair_audit/20261020_063953_stair_audit_fromzero_seed_0_geometry_0_stage_18_from20261020_062741",
+    "label": "latest"
+  },
+  "onnx_bytes": 23473520,
+  "parity_tests": [
+    {
+      "step": 0,
+      "action_error": 2.6226043701171875e-06,
+      "hidden_error": 3.2782554626464844e-06
+    },
+    {
+      "step": 1,
+      "action_error": 9.238719940185547e-07,
+      "hidden_error": 4.872679710388184e-06
+    },
+    {
+      "step": 2,
+      "action_error": 2.0265579223632812e-06,
+      "hidden_error": 5.0067901611328125e-06
+    },
+    {
+      "step": 3,
+      "action_error": 3.337860107421875e-06,
+      "hidden_error": 3.5762786865234375e-06
+    },
+    {
+      "step": 4,
+      "action_error": 9.5367431640625e-07,
+      "hidden_error": 3.606081008911133e-06
+    },
+    {
+      "step": 5,
+      "action_error": 1.3560056686401367e-06,
+      "hidden_error": 3.516674041748047e-06
+    },
+    {
+      "step": 6,
+      "action_error": 1.0728836059570312e-06,
+      "hidden_error": 5.9604644775390625e-06
+    },
+    {
+      "step": 7,
+      "action_error": 4.172325134277344e-07,
+      "hidden_error": 6.126239895820618e-06
+    },
+    {
+      "step": 8,
+      "action_error": 5.21540641784668e-07,
+      "hidden_error": 3.337860107421875e-06
+    },
+    {
+      "step": 9,
+      "action_error": 2.3245811462402344e-06,
+      "hidden_error": 5.27501106262207e-06
+    },
+    {
+      "step": 10,
+      "action_error": 5.960464477539062e-07,
+      "hidden_error": 1.6391277313232422e-06
+    },
+    {
+      "step": 11,
+      "action_error": 1.9073486328125e-06,
+      "hidden_error": 4.172325134277344e-06
+    }
+  ],
+  "model": {
+    "nq": 36,
+    "nv": 35,
+    "nu": 29,
+    "total_mass": 35.07570369
+  },
+  "urdf": "/home/ubuntu/workspace/instinct-ssr-stair-audited-fromzero-20261012/outputs/source_snapshots/bd961d3e3f21a8442dd008234503dcc9bbdacfa7/external_worktrees/instinctlab_stage4/source/instinctlab/instinctlab/tasks/parkour/urdf/o1_29dof_newlegs_noshoe.urdf",
+  "main_training_mutated": false
+}

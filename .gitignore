@@ -1,0 +1,13 @@
+node_modules/
+public/exports/
+uploads/
+export-logs/
+.omo/
+__pycache__/
+*.log
+check-*.png
+*.pt
+*.bundle
+*.tar.xz
+*.zip
+.DS_Store

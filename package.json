@@ -1,0 +1,8 @@
+{
+  "name": "o1-mujoco-wasm-checkpoint-preview",
+  "private": true,
+  "type": "module",
+  "scripts": {"serve": "node server.mjs", "check": "node browser-check.mjs"},
+  "dependencies": {"@mujoco/mujoco": "latest", "three": "^0.180.0", "onnxruntime-web": "^1.23.0"},
+  "devDependencies": {"playwright-core": "^1.56.0"}
+}

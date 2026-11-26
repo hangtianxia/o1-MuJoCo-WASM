@@ -9,6 +9,8 @@ export const DEFAULT_PANEL_SELECTORS = [
   '.chips .chip',
   '#theme-toggle',
   '#status',
+  '#mobile-dock',
+  '#touch-joy',
 ];
 
 const RGB_TO_YCC = [

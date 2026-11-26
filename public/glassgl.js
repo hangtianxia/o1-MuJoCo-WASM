@@ -434,5 +434,6 @@ export async function createGlassGL({
   }
 
   const setAmbient = () => {};
-  return { render, destroy, setAmbient, get active() { return !destroyed; }, get backend() { return 'webgl2'; } };
+  const refreshPanels = () => { panelsDirty = true; };
+  return { render, refreshPanels, destroy, setAmbient, get active() { return !destroyed; }, get backend() { return 'webgl2'; } };
 }

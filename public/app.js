@@ -78,6 +78,7 @@ const state = {
   command: [0.0, 0.0, 0.0],
   commandScale: { vx: 0.45, vy: 0.0, wz: 0.8 },
   keys: new Set(),
+  joystick: { x: 0, y: 0, active: false },
   keyboardEnabled: true,
   substeps: 4,
   controlDt: 0.02,
@@ -508,14 +509,153 @@ function installKeyboard() {
   window.addEventListener('blur', () => state.keys.clear());
 }
 
+function installTouchJoystick() {
+  const pad = qs('touch-joy');
+  const knob = qs('touch-joy-knob');
+  if (!pad || !knob) return;
+
+  const urlTouch = new URLSearchParams(location.search).get('touch');
+  const setTouchEnabled = (enabled) => {
+    document.body.classList.toggle('has-touch', enabled);
+    state.glass?.refreshPanels?.();
+  };
+  if (urlTouch === '1') {
+    setTouchEnabled(true);
+  } else if (urlTouch !== '0') {
+    const coarse = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    setTouchEnabled(coarse);
+    if (!coarse) {
+      // Support hybrid laptops/tablets that first receive touch input later.
+      window.addEventListener('touchstart', () => setTouchEnabled(true), { once: true, passive: true });
+    }
+  }
+
+  let activePointer = null;
+  const deadzone = 0.08;
+  const resetStick = () => {
+    activePointer = null;
+    state.joystick.x = 0;
+    state.joystick.y = 0;
+    state.joystick.active = false;
+    pad.classList.remove('active');
+    knob.style.transform = 'translate3d(0px, 0px, 0px)';
+  };
+  const updateStick = (clientX, clientY) => {
+    const rect = pad.getBoundingClientRect();
+    const maxR = Math.max(16, (rect.width - knob.offsetWidth) * 0.5);
+    const dx = clientX - (rect.left + rect.width * 0.5);
+    const dy = clientY - (rect.top + rect.height * 0.5);
+    const dist = Math.hypot(dx, dy);
+    const clamped = dist > maxR ? maxR / dist : 1;
+    const kx = dx * clamped;
+    const ky = dy * clamped;
+    knob.style.transform = `translate3d(${kx.toFixed(1)}px, ${ky.toFixed(1)}px, 0px)`;
+
+    const norm = Math.min(1, dist / maxR);
+    if (norm <= deadzone) {
+      state.joystick.x = 0;
+      state.joystick.y = 0;
+    } else {
+      const scaled = (norm - deadzone) / (1 - deadzone);
+      const dirX = dist > 1e-4 ? dx / dist : 0;
+      const dirY = dist > 1e-4 ? dy / dist : 0;
+      state.joystick.x = dirX * scaled;
+      state.joystick.y = -dirY * scaled;
+    }
+  };
+
+  pad.addEventListener('pointerdown', (e) => {
+    if (activePointer !== null) return;
+    e.preventDefault();
+    e.stopPropagation();
+    activePointer = e.pointerId;
+    state.joystick.active = true;
+    pad.classList.add('active');
+    pad.setPointerCapture?.(e.pointerId);
+    updateStick(e.clientX, e.clientY);
+  });
+  pad.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== activePointer) return;
+    e.preventDefault();
+    e.stopPropagation();
+    updateStick(e.clientX, e.clientY);
+  });
+  const endPointer = (e) => {
+    if (e.pointerId !== activePointer) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (pad.hasPointerCapture?.(e.pointerId)) pad.releasePointerCapture(e.pointerId);
+    resetStick();
+  };
+  pad.addEventListener('pointerup', endPointer);
+  pad.addEventListener('pointercancel', endPointer);
+  window.addEventListener('blur', resetStick);
+}
+
+function installMobileUi() {
+  const controlsPanel = qs('controls');
+  const telemetryPanel = qs('telemetry');
+  const btnControls = qs('btn-drawer-controls');
+  const btnTelemetry = qs('btn-drawer-telemetry');
+  const btnPlay = qs('btn-mobile-play');
+  if (!controlsPanel || !telemetryPanel || !btnControls || !btnTelemetry) return;
+
+  const setDrawer = (which) => {
+    const openControls = which === 'controls' && !controlsPanel.classList.contains('mobile-open');
+    const openTelemetry = which === 'telemetry' && !telemetryPanel.classList.contains('mobile-open');
+    controlsPanel.classList.toggle('mobile-open', openControls);
+    telemetryPanel.classList.toggle('mobile-open', openTelemetry);
+    btnControls.classList.toggle('active', openControls);
+    btnTelemetry.classList.toggle('active', openTelemetry);
+    btnControls.setAttribute('aria-expanded', String(openControls));
+    btnTelemetry.setAttribute('aria-expanded', String(openTelemetry));
+    state.glass?.refreshPanels?.();
+  };
+
+  btnControls.addEventListener('click', () => setDrawer('controls'));
+  btnTelemetry.addEventListener('click', () => setDrawer('telemetry'));
+  if (btnPlay) btnPlay.addEventListener('click', () => qs('btn-play')?.click());
+
+  const mq = matchMedia('(max-width: 960px)');
+  const syncViewport = () => {
+    if (!mq.matches) {
+      controlsPanel.classList.remove('mobile-open');
+      telemetryPanel.classList.remove('mobile-open');
+      btnControls.classList.remove('active');
+      btnTelemetry.classList.remove('active');
+      btnControls.setAttribute('aria-expanded', 'false');
+      btnTelemetry.setAttribute('aria-expanded', 'false');
+    }
+    state.glass?.refreshPanels?.();
+  };
+  mq.addEventListener('change', syncViewport);
+}
+
+function syncPlayUi() {
+  const label = state.running ? 'Pause' : 'Resume';
+  const running = String(state.running);
+  for (const id of ['btn-play', 'btn-mobile-play']) {
+    const el = qs(id);
+    if (el) {
+      el.textContent = label;
+      el.dataset.running = running;
+    }
+  }
+}
+
 function updateCommandFromKeys() {
   if (!state.keyboardEnabled) return;
   const k = state.keys;
+  const j = state.joystick;
   const s = state.commandScale;
+  const keyVx = (k.has('KeyW') ? s.vx : 0) + (k.has('KeyS') ? -s.vx * 0.6 : 0);
+  const joyVx = j.y >= 0 ? j.y * s.vx : j.y * s.vx * 0.6;
+  const keyWz = (k.has('KeyA') ? s.wz : 0) + (k.has('KeyD') ? -s.wz : 0);
+  const joyWz = -j.x * s.wz;
   const target = [
-    (k.has('KeyW') ? s.vx : 0) + (k.has('KeyS') ? -s.vx * 0.6 : 0),
+    Math.max(-s.vx * 0.6, Math.min(s.vx, keyVx + joyVx)),
     (k.has('KeyE') ? s.vy : 0) + (k.has('KeyQ') ? -s.vy : 0),
-    (k.has('KeyA') ? s.wz : 0) + (k.has('KeyD') ? -s.wz : 0),
+    Math.max(-s.wz, Math.min(s.wz, keyWz + joyWz)),
   ];
   // ~0.15 s ramp at 50 Hz, matching the smooth command routing used in training.
   const alpha = 0.18;
@@ -1593,8 +1733,7 @@ function setupUi() {
 
   qs('btn-play').addEventListener('click', () => {
     state.running = !state.running;
-    qs('btn-play').textContent = state.running ? 'Pause' : 'Resume';
-    qs('btn-play').dataset.running = String(state.running);
+    syncPlayUi();
   });
   qs('btn-reset').addEventListener('click', () => resetSim());
   qs('btn-check').addEventListener('click', async () => {
@@ -1966,11 +2105,7 @@ async function hotLoadExport(id) {
   } finally {
     state.checking = false;
     state.running = wasRunning;
-    const play = qs('btn-play');
-    if (play) {
-      play.textContent = state.running ? 'Pause' : 'Resume';
-      play.dataset.running = String(state.running);
-    }
+    syncPlayUi();
   }
 }
 
@@ -2762,6 +2897,8 @@ async function boot() {
   applyUrlParams();
   setupUi();
   installKeyboard();
+  installTouchJoystick();
+  installMobileUi();
   setStatus('loading meshes + ONNX policy...');
   await loadRobotVisuals(base);
 
@@ -2871,8 +3008,7 @@ async function boot() {
   };
 
   state.running = !new URLSearchParams(location.search).has('autostart');
-  document.getElementById('btn-play').textContent = state.running ? 'Pause' : 'Resume';
-  document.getElementById('btn-play').dataset.running = String(state.running);
+  syncPlayUi();
   requestAnimationFrame(loop);
   lastFrame = performance.now();
   startControlLoop();

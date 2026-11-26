@@ -659,7 +659,8 @@ export async function createGlassGPU({
   }
 
   const setAmbient = () => {};
+  const refreshPanels = () => { panelsDirty = true; };
 
-  window.__glassGPU = { get active() { return !destroyed; }, get panels() { return panels.length; }, render, destroy };
-  return { render, destroy, setAmbient, get active() { return !destroyed; }, get backend() { return 'webgpu'; } };
+  window.__glassGPU = { get active() { return !destroyed; }, get panels() { return panels.length; }, render, refreshPanels, destroy };
+  return { render, refreshPanels, destroy, setAmbient, get active() { return !destroyed; }, get backend() { return 'webgpu'; } };
 }

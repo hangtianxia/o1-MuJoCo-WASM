@@ -19,6 +19,21 @@ function slab(boxes, x0, x1, top, width) {
   });
 }
 
+function liftAboveGround(boxes, spawn) {
+  let minTop = 0;
+  for (const b of boxes) {
+    if (b.top < minTop) minTop = b.top;
+  }
+  if (minTop >= 0) return 0;
+  const lift = -minTop;
+  for (const b of boxes) {
+    b.top += lift;
+    b.cz += lift;
+  }
+  if (spawn) spawn.z += lift;
+  return lift;
+}
+
 export function terrainTopAt(boxes, x, y = 0) {
   let top = -Infinity;
   for (const b of boxes) {
@@ -74,10 +89,12 @@ export function buildTerrain(config, direction, level) {
   slab(boxes, prevEnd, extent, top, width);
 
   const spawnX = Number(spec.spawn_origin_x ?? 0.2);
+  const spawn = { x: spawnX, y: 0, z: terrainTopAt(boxes, spawnX, 0) };
+  liftAboveGround(boxes, spawn);
   return {
     direction, level: clamped, label: `${direction} L${clamped}`,
     boxes,
-    spawn: { x: spawnX, y: 0, z: terrainTopAt(boxes, spawnX, 0) },
+    spawn,
     spec,
   };
 }
@@ -129,12 +146,14 @@ export function buildUniformTerrain({
   const extent = Math.max(9.2, x + endPlatform + 0.5);
   slab(boxes, x, extent, top, width);
   const spawnX = 0.2;
+  const spawn = { x: spawnX, y: 0, z: terrainTopAt(boxes, spawnX, 0) };
+  liftAboveGround(boxes, spawn);
   return {
     direction,
     level: null,
     label: `uniform ${direction}`,
     boxes,
-    spawn: { x: spawnX, y: 0, z: terrainTopAt(boxes, spawnX, 0) },
+    spawn,
     spec: {
       uniform: true,
       direction,

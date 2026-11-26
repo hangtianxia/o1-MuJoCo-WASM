@@ -1283,7 +1283,10 @@ function applyTerrain(direction = state.direction, level = state.level) {
         camera.zoom = 1;
         camera.clearViewOffset();
       }
-      controls.target.set(state.terrain.spawn.x + 0.8, 0, state.terrain.spawn.z + 0.7);
+      const prevTargetZ = controls.target.z;
+      const nextTargetZ = state.terrain.spawn.z + 0.7;
+      controls.target.set(state.terrain.spawn.x + 0.8, 0, nextTargetZ);
+      camera.position.z += nextTargetZ - prevTargetZ;
     }
     controls.update();
   }

@@ -8,9 +8,17 @@ import { createGlassGPU } from './glassgpu.js';
 import { createGlassGL } from './glassgl.js';
 import { createAmbientLayer } from './ambient.js';
 
-const CORES = Math.max(1, Math.min(4, navigator.hardwareConcurrency || 1));
+const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const urlThreads = Number(new URLSearchParams(location.search).get('threads'));
+// Safari/WebKit pthread Atomics.wait overhead makes 4-thread WASM ~8-10x slower
+// than 1-thread SIMD on this compact GRU policy and slows initial load.
+const CORES = Number.isFinite(urlThreads) && urlThreads >= 1
+  ? Math.min(8, Math.floor(urlThreads))
+  : IS_SAFARI ? 1 : Math.max(1, Math.min(4, navigator.hardwareConcurrency || 1));
+const urlProxy = new URLSearchParams(location.search).get('proxy');
 ort.env.wasm.numThreads = CORES;
-ort.env.wasm.proxy = false;
+// Offload ONNX inference to a dedicated worker on Safari so main-thread rAF & camera drag never stall.
+ort.env.wasm.proxy = urlProxy !== null ? urlProxy === '1' : IS_SAFARI;
 ort.env.wasm.wasmPaths = '/node_modules/onnxruntime-web/dist/';
 ort.env.logLevel = 'error';
 
@@ -762,6 +770,58 @@ function unpackDepthBuffer(pixels) {
   return out;
 }
 
+let depthPbo = null;
+let depthPboSize = 0;
+let depthReadJob = null;
+
+function pollDepthReadback(flush = false) {
+  const job = depthReadJob;
+  if (!job || !renderer) return false;
+  const gl = renderer.getContext();
+  const status = gl.clientWaitSync(job.sync, flush ? gl.SYNC_FLUSH_COMMANDS_BIT : 0, 0);
+  if (status === gl.TIMEOUT_EXPIRED) return false;
+  depthReadJob = null;
+  if (status !== gl.WAIT_FAILED) {
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, depthPbo);
+    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, job.buffer);
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+  }
+  gl.deleteSync(job.sync);
+  if (job.timer) clearTimeout(job.timer);
+  job.resolve(status !== gl.WAIT_FAILED);
+  return true;
+}
+
+function readDepthTargetAsync(buffer) {
+  const gl = renderer.getContext();
+  if (!(gl instanceof WebGL2RenderingContext)) {
+    return renderer.readRenderTargetPixelsAsync(depthTarget, 0, 0, DEPTH_W, DEPTH_H, buffer).then(() => true);
+  }
+  if (!depthPbo || depthPboSize !== buffer.byteLength) {
+    if (depthPbo) gl.deleteBuffer(depthPbo);
+    depthPbo = gl.createBuffer();
+    depthPboSize = buffer.byteLength;
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, depthPbo);
+    gl.bufferData(gl.PIXEL_PACK_BUFFER, depthPboSize, gl.STREAM_READ);
+  } else {
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, depthPbo);
+  }
+  gl.readPixels(0, 0, DEPTH_W, DEPTH_H, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+  gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+  const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+  if (document.hidden) gl.flush();
+  return new Promise((resolve) => {
+    const job = { sync, buffer, resolve, timer: 0 };
+    depthReadJob = job;
+    // Fallback poll only when rAF is paused (e.g. hidden tab or throttled render)
+    const fallback = () => {
+      if (depthReadJob !== job) return;
+      if (!pollDepthReadback(true)) job.timer = setTimeout(fallback, 16);
+    };
+    job.timer = setTimeout(fallback, 24);
+  });
+}
+
 async function renderDepthAsync() {
   if (!depthTarget) return new Float32Array(DEPTH_OUT * DEPTH_OUT);
   const t0 = performance.now();
@@ -788,10 +848,9 @@ async function renderDepthAsync() {
   renderer.setClearColor(0x000000, 0);
   renderer.clear();
   renderer.render(scene, depthCamera);
-  const buffer = new Uint8Array(DEPTH_W * DEPTH_H * 4);
-  const promise = renderer.readRenderTargetPixelsAsync(
-    depthTarget, 0, 0, DEPTH_W, DEPTH_H, buffer,
-  );
+  if (!state.depthAsyncBuffer) state.depthAsyncBuffer = new Uint8Array(DEPTH_W * DEPTH_H * 4);
+  const buffer = state.depthAsyncBuffer;
+  const promise = readDepthTargetAsync(buffer);
   renderer.setRenderTarget(null);
   renderer.setClearColor(state.sceneClear, 1);
   scene.overrideMaterial = oldOverride;
@@ -2416,27 +2475,27 @@ function updateRenderNote() {
 }
 
 function updateControlPressure() {
-  const slow = state.perf.controlHz > 0 && state.perf.controlHz < 48 && state.perf.simRate < 0.95;
-  const fast = state.perf.controlHz >= 48 && state.perf.simRate >= 0.97;
+  const slow = state.perf.controlHz > 0 && state.perf.controlHz < 42 && state.perf.simRate < 0.88;
+  const fast = state.perf.controlHz >= 46 && state.perf.simRate >= 0.94;
   if (!state.renderLimited) {
     state.lowRateTicks = slow ? state.lowRateTicks + 1 : 0;
-    if (state.lowRateTicks >= 2) {
+    if (state.lowRateTicks >= 3) {
       state.renderLimited = true;
-      state.renderIntervalMs = 1000 / 20;
+      state.renderIntervalMs = 1000 / 30;
       state.highRateTicks = 0;
       state.lowRateTicks = 0;
       updateRenderNote();
     }
   } else {
-    if (slow && state.renderIntervalMs > 1000 / 18) {
+    if (slow && state.renderIntervalMs > 1000 / 24) {
       state.lowRateTicks += 1;
-      if (state.lowRateTicks >= 2) {
-        state.renderIntervalMs = 1000 / 15;
+      if (state.lowRateTicks >= 3) {
+        state.renderIntervalMs = 1000 / 20;
         updateRenderNote();
       }
     }
     state.highRateTicks = fast ? state.highRateTicks + 1 : 0;
-    if (state.highRateTicks >= 3) {
+    if (state.highRateTicks >= 2) {
       state.renderLimited = false;
       state.renderIntervalMs = 0;
       state.lowRateTicks = 0;
@@ -2445,44 +2504,59 @@ function updateControlPressure() {
   }
 }
 
-async function controlTick() {
-  controlTimer = null;
-  if (!state.ready) {
-    controlTimer = setTimeout(controlTick, 50);
+let controlInFlight = false;
+let lastRafControlAt = 0;
+
+async function pumpControl() {
+  if (controlInFlight || !state.ready) return;
+  const now = performance.now();
+  if (!state.running || state.checking) {
+    nextControlAt = now;
     return;
   }
-  const now = performance.now();
-  if (state.running && !state.checking) {
-    if (now >= nextControlAt - 2) {
-      try {
-        await controlStep();
-        bumpControlRate();
-      } catch (err) {
-        state.running = false;
-        setStatus(`error: ${err.message}`, true);
-        console.error(err);
-      }
+  if (now < nextControlAt - 2) return;
+  controlInFlight = true;
+  try {
+    let catchup = 0;
+    while (performance.now() >= nextControlAt - 2 && catchup < 2) {
+      await controlStep();
+      bumpControlRate();
       nextControlAt += (state.controlDt * 1000) / state.speed;
-      // After a long render or tab stall, drop the backlog instead of bursting.
-      if (nextControlAt < now - 200) nextControlAt = now;
+      catchup += 1;
+      if (nextControlAt < performance.now() - 200) {
+        nextControlAt = performance.now();
+        break;
+      }
+      if (performance.now() - now > 12) break;
     }
-  } else {
-    nextControlAt = now;
+  } catch (err) {
+    state.running = false;
+    setStatus(`error: ${err.message}`, true);
+    console.error(err);
+  } finally {
+    controlInFlight = false;
   }
-  const delay = Math.max(0, nextControlAt - performance.now());
-  controlTimer = setTimeout(controlTick, Math.min(delay, 25));
+}
+
+async function controlTick() {
+  controlTimer = null;
+  if (document.hidden || performance.now() - lastRafControlAt > 80) {
+    await pumpControl();
+  }
+  controlTimer = setTimeout(controlTick, document.hidden ? 25 : 40);
 }
 
 function startControlLoop() {
   if (controlTimer) return;
   nextControlAt = performance.now();
-  controlTimer = setTimeout(controlTick, 0);
+  controlTimer = setTimeout(controlTick, 40);
 }
 
 function loop(now) {
   requestAnimationFrame(loop);
-  const dt = Math.min(0.1, (now - lastFrame) / 1000);
   lastFrame = now;
+
+  pollDepthReadback(true);
 
   const canRender = !state.renderIntervalMs || (now - lastRenderAt >= state.renderIntervalMs);
   if (canRender && renderer && scene && camera) {
@@ -2501,6 +2575,10 @@ function loop(now) {
     const ms = performance.now() - tRender;
     state.perf.renderMs = state.perf.renderMs ? state.perf.renderMs * 0.85 + ms * 0.15 : ms;
   }
+
+  lastRafControlAt = performance.now();
+  pumpControl();
+
   if (now - lastHud > 100) {
     lastHud = now;
     updateHud();
@@ -2609,21 +2687,15 @@ async function runCheck({ steps = 250, command = null } = {}) {
       const glassMode = new URLSearchParams(location.search).get('glass');
       if (glassMode === 'css') { setBadge('glass · css', 'css'); return; }
       const startGL = async () => {
-        const host = document.getElementById('glass-gpu');
-        const fresh = host.cloneNode(false);
-        fresh.id = 'glass-gpu';
-        fresh.setAttribute('aria-hidden', 'true');
-        host.replaceWith(fresh);
         setBadge('glass · webgl2', 'webgl2');
         state.glass = await createGlassGL({
-          canvas: fresh,
+          renderer,
           sceneCanvas: renderer.domElement,
-          ambientCanvas: state.ambient?.canvas,
         });
-        if (state.glass) console.log('webgl2 glass active');
+        if (state.glass) console.log('webgl2 inline glass active');
       };
       if (glassMode !== 'css') {
-        if (glassMode !== 'gl') {
+        if (glassMode === 'webgpu' || (!IS_SAFARI && glassMode !== 'gl')) {
           setBadge('glass · webgpu', 'webgpu');
           state.glass = await createGlassGPU({
             canvas: document.getElementById('glass-gpu'),

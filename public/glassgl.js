@@ -1,4 +1,6 @@
-// WebGL2 liquid-glass compositor matching the WebGPU iOS 26.5 optical pipeline:
+// Zero-copy same-context WebGL2 liquid-glass post-pass inside Three.js's own
+// WebGL2 context (eliminates cross-canvas readback/stalls on Safari/WebKit).
+// Implements the same iOS 26.5 optical pipeline as glassgpu.js:
 // G2 continuous superellipse SDF, mipmapped variable blur, dual-layer spherical
 // refraction with subtle edge dispersion, YCC face & bleed color matrices, soft
 // optical shadows, and 45-degree key/fill vibrant specular rims.
@@ -15,7 +17,7 @@ const FRAG = `#version 300 es
 precision highp float;
 
 uniform vec4 uResMeta;           // cssW, cssH, count, lightFlag
-uniform vec2 uCanvas;            // backing canvas px
+uniform vec2 uCanvas;            // backing framebuffer px
 uniform vec4 uPanels[12];        // x, y, w, h (CSS px)
 uniform float uRadii[12];
 uniform vec4 uFaceCM0;
@@ -107,8 +109,10 @@ vec3 sampleScene(vec2 uv, float lod) {
 void main() {
   vec2 res = uResMeta.xy;
   int count = int(uResMeta.z + 0.5);
-  vec2 uv = vec2(gl_FragCoord.x / uCanvas.x, 1.0 - gl_FragCoord.y / uCanvas.y);
-  vec2 p = uv * res;
+  // uScene is copied directly from the default WebGL framebuffer (origin bottom-left).
+  vec2 texUv = gl_FragCoord.xy / uCanvas;
+  vec2 cssUv = vec2(texUv.x, 1.0 - texUv.y);
+  vec2 p = cssUv * res;
 
   int chosen = -1;
   float chosenD = 1.0e9;
@@ -120,6 +124,10 @@ void main() {
     if (i >= count) break;
     vec4 rect = uPanels[i];
     if (rect.z <= 0.0 || rect.w <= 0.0) continue;
+    vec2 halfSize = rect.zw * 0.5;
+    vec2 qBox = abs(p - (rect.xy + halfSize)) - halfSize;
+    float boxD = max(qBox.x, qBox.y);
+    if (boxD > 60.0) continue;
     float radius = uRadii[i];
     float d = panelSdf(p, rect, radius);
     if (d < chosenD) {
@@ -163,6 +171,8 @@ void main() {
   float gx = panelSdf(p + vec2(eps, 0.0), rect, chosenRadius) - panelSdf(p - vec2(eps, 0.0), rect, chosenRadius);
   float gy = panelSdf(p + vec2(0.0, eps), rect, chosenRadius) - panelSdf(p - vec2(0.0, eps), rect, chosenRadius);
   vec2 normal = normalize(vec2(gx, gy) + vec2(1e-5, 0.0));
+  // Convert CSS-space normal (+y down) to WebGL texture space (+v up)
+  vec2 texNormal = vec2(normal.x, -normal.y);
 
   float innerHeight = clamp(D * 0.24, 10.0, 22.0);
   float innerAmount = -min(D * 0.60, 48.0);
@@ -178,15 +188,15 @@ void main() {
   float outerLod = radiusLOD(baseBlur * 0.18);
 
   float disp = uOptics.z;
-  vec2 innerVec = (normal * innerDisp) / res;
-  vec2 outerVec = (normal * outerDisp) / res;
+  vec2 innerVec = (texNormal * innerDisp) / res;
+  vec2 outerVec = (texNormal * outerDisp) / res;
 
-  float cr = sampleScene(uv + innerVec * (1.0 - disp), innerLod).r;
-  float cg = sampleScene(uv + innerVec, innerLod).g;
-  float cb = sampleScene(uv + innerVec * (1.0 + disp), innerLod).b;
+  float cr = sampleScene(texUv + innerVec * (1.0 - disp), innerLod).r;
+  float cg = sampleScene(texUv + innerVec, innerLod).g;
+  float cb = sampleScene(texUv + innerVec * (1.0 + disp), innerLod).b;
   vec3 refracted = vec3(cr, cg, cb);
 
-  vec3 outerSrc = sampleScene(uv + outerVec, outerLod);
+  vec3 outerSrc = sampleScene(texUv + outerVec, outerLod);
   float outerMix = clamp((d + 1.5) / 1.5, 0.0, 1.0) * 0.30;
   refracted = mix(refracted, outerSrc, outerMix);
 
@@ -198,7 +208,7 @@ void main() {
     float bleedAmount = clamp(D * 0.35, 12.0, 48.0);
     float bleedDisp = sphereProfile(bleedAmount, 1.0 / bleedHeight, d);
     float bleedLod = radiusLOD(clamp(D * 0.22, 8.0, 28.0));
-    vec3 bleedSrc = sampleScene(uv + (normal * bleedDisp) / res, bleedLod);
+    vec3 bleedSrc = sampleScene(texUv + (texNormal * bleedDisp) / res, bleedLod);
     vec3 bleedRGB = applyCM(bleedSrc, uBleedCM0, uBleedCM1, uBleedCM2);
     float bleedRamp = 1.0 - clamp(-d / max(bleedHeight, 1.0), 0.0, 1.0);
     float luma = clamp(dot(faceRGB, vec3(0.2125, 0.7154, 0.0721)), 0.0, 1.0);
@@ -255,17 +265,14 @@ function compile(gl, type, source) {
 }
 
 export async function createGlassGL({
-  canvas,
-  sceneCanvas,
-  ambientCanvas = null,
+  renderer = null,
+  canvas = null,
+  sceneCanvas = null,
   panelSelectors = DEFAULT_PANEL_SELECTORS,
 } = {}) {
-  if (!canvas || !sceneCanvas) return null;
-  let gl = null;
-  try {
-    gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
-  } catch (_) {}
-  if (!gl) return null;
+  const inline = Boolean(renderer && typeof renderer.getContext === 'function');
+  const gl = inline ? renderer.getContext() : canvas?.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
+  if (!gl || !(gl instanceof WebGL2RenderingContext)) return null;
 
   const vs = compile(gl, gl.VERTEX_SHADER, VERT);
   const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
@@ -279,7 +286,6 @@ export async function createGlassGL({
     console.error('[glass-gl] link', gl.getProgramInfoLog(program));
     return null;
   }
-  gl.useProgram(program);
 
   const U = {};
   for (const name of [
@@ -292,6 +298,7 @@ export async function createGlassGL({
     U[name] = gl.getUniformLocation(program, name);
   }
 
+  const vao = gl.createVertexArray();
   const texture = gl.createTexture();
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -299,51 +306,72 @@ export async function createGlassGL({
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.uniform1i(U.uScene, 0);
-  gl.disable(gl.DEPTH_TEST);
-  gl.disable(gl.BLEND);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 4);
+  if (inline) renderer.resetState();
 
   let panels = [];
+  let panelsDirty = true;
   let themeParams = getThemeGlassParams(document.documentElement.dataset.theme || 'dark');
   let destroyed = false;
+  let texW = 0;
+  let texH = 0;
   const rects = new Float32Array(MAX_PANELS * 4);
   const radii = new Float32Array(MAX_PANELS);
 
   const updatePanels = () => {
     panels = collectPanels(panelSelectors, MAX_PANELS);
-  };
-
-  const resize = () => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = Math.max(1, Math.round((innerWidth || 1) * dpr));
-    const h = Math.max(1, Math.round((innerHeight || 1) * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
-    }
-    gl.viewport(0, 0, w, h);
+    panelsDirty = false;
   };
 
   const render = () => {
     if (destroyed) return;
-    if (!sceneCanvas.width || !sceneCanvas.height) return;
-    updatePanels();
-    resize();
+    if (panelsDirty) updatePanels();
+    if (!panels.length) return;
 
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    const w = gl.drawingBufferWidth;
+    const h = gl.drawingBufferHeight;
+    if (!w || !h) return;
+
+    // Zero-copy on-GPU copy from Three.js's default framebuffer into our mipmapped texture.
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    try {
+    if (inline) {
+      if (texW !== w || texH !== h) {
+        texW = w;
+        texH = h;
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      }
+      gl.copyTexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 0, 0, w, h);
+    } else if (sceneCanvas) {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sceneCanvas);
-      gl.generateMipmap(gl.TEXTURE_2D);
-    } catch (error) {
-      console.warn('[glass-gl] scene upload failed', error);
+    } else {
       return;
+    }
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    gl.viewport(0, 0, w, h);
+    gl.disable(gl.SCISSOR_TEST);
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    gl.depthMask(false);
+    gl.colorMask(true, true, true, true);
+    if (inline) {
+      gl.enable(gl.BLEND);
+      gl.blendEquation(gl.FUNC_ADD);
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    } else {
+      gl.disable(gl.BLEND);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
     gl.useProgram(program);
+    gl.bindVertexArray(vao);
+    gl.uniform1i(U.uScene, 0);
     gl.uniform4f(U.uResMeta, innerWidth || 1, innerHeight || 1, panels.length, themeParams.light);
-    gl.uniform2f(U.uCanvas, canvas.width, canvas.height);
+    gl.uniform2f(U.uCanvas, w, h);
 
     rects.fill(0);
     radii.fill(0);
@@ -370,27 +398,27 @@ export async function createGlassGL({
     gl.uniform4fv(U.uRimParams, themeParams.rimParams);
     gl.uniform4fv(U.uOptics, themeParams.optics);
 
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindVertexArray(null);
+    if (inline) renderer.resetState();
   };
 
-  const onResize = () => { resize(); updatePanels(); };
+  const onResize = () => { panelsDirty = true; };
   const onTheme = () => {
     themeParams = getThemeGlassParams(document.documentElement.dataset.theme || 'dark');
-    updatePanels();
+    panelsDirty = true;
   };
 
-  const observer = new ResizeObserver(() => updatePanels());
+  const observer = new ResizeObserver(() => { panelsDirty = true; });
   for (const selector of panelSelectors) {
     document.querySelectorAll(selector).forEach((el) => observer.observe(el));
   }
   addEventListener('resize', onResize);
   document.addEventListener('themechange', onTheme);
-  resize();
   updatePanels();
   document.body.classList.add('glass-gpu');
-  window.__glassGL = { get active() { return !destroyed; }, get panels() { return panels.length; }, render, destroy };
+  if (inline) document.body.classList.add('glass-inline');
+  window.__glassGL = { get active() { return !destroyed; }, get panels() { return panels.length; }, inline, render, destroy };
 
   function destroy() {
     if (destroyed) return;
@@ -398,9 +426,11 @@ export async function createGlassGL({
     removeEventListener('resize', onResize);
     document.removeEventListener('themechange', onTheme);
     observer.disconnect();
-    document.body.classList.remove('glass-gpu');
+    document.body.classList.remove('glass-gpu', 'glass-inline');
     gl.deleteTexture(texture);
+    gl.deleteVertexArray(vao);
     gl.deleteProgram(program);
+    if (inline) renderer.resetState();
   }
 
   const setAmbient = () => {};

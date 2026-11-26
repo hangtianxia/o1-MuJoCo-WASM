@@ -193,7 +193,15 @@
   html[data-theme="dark"] body.glass-gpu :where(select, button:not(.primary):not(#theme-toggle), .tab:not(.active)):hover:not(:disabled) {
     background-color: rgba(255, 255, 255, 0.085) !important;
   }
+  body.glass-gpu #glass-badge {
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    background: rgba(16, 23, 35, 0.72); border-color: rgba(255, 255, 255, 0.14);
+  }
+  html[data-theme="light"] body.glass-gpu #glass-badge {
+    background: rgba(244, 248, 253, 0.86); border-color: rgba(20, 42, 70, 0.14);
+  }
   body.glass-gpu #glass-gpu { display: block; }
+  body.glass-inline #glass-gpu { display: none !important; }
   body.glass-gpu :where(#controls, #telemetry, .chips .chip, #theme-toggle, #status):not(.ckpt-item) {
     background: transparent !important;
     background-image: none !important;
@@ -881,7 +889,7 @@
       let previousSize = '';
       const update = () => {
         frame = null;
-        if (reducedTransparency.matches) {
+        if (reducedTransparency.matches || document.body.classList.contains('glass-gpu')) {
           element.style.removeProperty('--lg-lens');
           return;
         }
@@ -950,14 +958,15 @@
   let glassFrame = null;
   let glassPointer;
   document.addEventListener('pointermove', (event) => {
-    if (reducedMotion.matches || event.pointerType !== 'mouse') return;
+    if (reducedMotion.matches || event.pointerType !== 'mouse' || document.body.classList.contains('glass-gpu')) return;
     glassPointer = { x: event.clientX, y: event.clientY };
     if (glassFrame !== null) return;
     glassFrame = requestAnimationFrame(() => {
       glassFrame = null;
-      if (reducedMotion.matches) return;
+      if (reducedMotion.matches || document.body.classList.contains('glass-gpu')) return;
       const style = document.documentElement.style;
-      style.cssText += `; --glass-x: ${glassPointer.x / innerWidth * 100}%; --glass-y: ${glassPointer.y / innerHeight * 100}%;`;
+      style.setProperty('--glass-x', `${(glassPointer.x / innerWidth * 100).toFixed(2)}%`);
+      style.setProperty('--glass-y', `${(glassPointer.y / innerHeight * 100).toFixed(2)}%`);
     });
   }, { passive: true });
   addEventListener('keydown', (e) => {

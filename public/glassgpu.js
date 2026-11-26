@@ -207,6 +207,11 @@ fn fs(in: VsOut) -> @location(0) vec4f {
     if (i >= count) { break; }
     let rect = u.panels[i];
     if (rect.z <= 0.0 || rect.w <= 0.0) { continue; }
+    // Fast AABB early-out so pixels in the open 3D viewport skip squircle SDF math
+    let half = rect.zw * 0.5;
+    let qBox = abs(p - (rect.xy + half)) - half;
+    let boxD = max(qBox.x, qBox.y);
+    if (boxD > 60.0) { continue; }
     let radius = radiusAt(i);
     let d = panelSdf(p, rect, radius);
     if (d < chosenD) {
@@ -360,14 +365,14 @@ export async function createGlassGPU({
 
   let adapter;
   let device;
-  for (let attempt = 0; attempt < 6; attempt++) {
+  for (let attempt = 0; attempt < 2; attempt++) {
     try {
       adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
       if (adapter) break;
     } catch (error) {
       console.warn('[glass-gpu] adapter attempt failed', error);
     }
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 50));
   }
   if (!adapter) { console.warn('[glass-gpu] no adapter'); return null; }
 
@@ -454,12 +459,13 @@ export async function createGlassGPU({
   let sceneHeight = 0;
   let destroyed = false;
   let panels = [];
+  let panelsDirty = true;
   let themeParams = getThemeGlassParams(document.documentElement.dataset.theme || 'dark');
 
   const resize = () => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = Math.max(1, Math.round((innerWidth || 1) * dpr));
-    const height = Math.max(1, Math.round((innerHeight || 1) * dpr));
+    // Match sceneCanvas 1x CSS resolution to avoid wasteful 4x oversampling on Retina displays.
+    const width = Math.max(1, Math.round(innerWidth || 1));
+    const height = Math.max(1, Math.round(innerHeight || 1));
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
@@ -517,6 +523,7 @@ export async function createGlassGPU({
 
   const updatePanels = () => {
     panels = collectPanels(panelSelectors, MAX_PANELS);
+    panelsDirty = false;
     return panels;
   };
 
@@ -571,8 +578,10 @@ export async function createGlassGPU({
       return;
     }
 
-    updatePanels();
-    writeUniforms();
+    if (panelsDirty) {
+      updatePanels();
+      writeUniforms();
+    }
 
     const encoder = device.createCommandEncoder();
 
@@ -611,18 +620,19 @@ export async function createGlassGPU({
 
   const onResize = () => {
     resize();
-    updatePanels();
+    panelsDirty = true;
   };
   const onTheme = () => {
     themeParams = getThemeGlassParams(document.documentElement.dataset.theme || 'dark');
-    updatePanels();
+    panelsDirty = true;
   };
 
   resize();
   updatePanels();
+  writeUniforms();
   addEventListener('resize', onResize);
   document.addEventListener('themechange', onTheme);
-  const observer = new ResizeObserver(() => updatePanels());
+  const observer = new ResizeObserver(() => { panelsDirty = true; });
   for (const selector of panelSelectors) {
     document.querySelectorAll(selector).forEach((el) => observer.observe(el));
   }

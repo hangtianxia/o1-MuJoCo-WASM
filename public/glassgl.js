@@ -1,8 +1,9 @@
-// WebGL2 fallback for the WebGPU liquid-glass compositor. Same SDF glass,
-// dispersion, bevel and ambient math, for browsers/drivers where WebGPU
-// rendering is unavailable.
+// WebGL2 liquid-glass compositor matching the WebGPU iOS 26.5 optical pipeline:
+// G2 continuous superellipse SDF, mipmapped variable blur, dual-layer spherical
+// refraction with subtle edge dispersion, YCC face & bleed color matrices, soft
+// optical shadows, and 45-degree key/fill vibrant specular rims.
 
-const MAX_PANELS = 4;
+import { MAX_PANELS, DEFAULT_PANEL_SELECTORS, getThemeGlassParams, collectPanels } from './glass-math.js';
 
 const VERT = `#version 300 es
 void main() {
@@ -12,119 +13,234 @@ void main() {
 
 const FRAG = `#version 300 es
 precision highp float;
-uniform vec2 uCss;
-uniform vec2 uCanvas;
-uniform float uCount;
-uniform float uTime;
-uniform vec4 uPanels[4];
-uniform vec4 uRadii;
-uniform vec4 uFaceTop;
-uniform vec4 uFaceBottom;
-uniform vec4 uRim;
-uniform vec4 uBevel;
-uniform vec4 uShade;
+
+uniform vec4 uResMeta;           // cssW, cssH, count, lightFlag
+uniform vec2 uCanvas;            // backing canvas px
+uniform vec4 uPanels[12];        // x, y, w, h (CSS px)
+uniform float uRadii[12];
+uniform vec4 uFaceCM0;
+uniform vec4 uFaceCM1;
+uniform vec4 uFaceCM2;
+uniform vec4 uBleedCM0;
+uniform vec4 uBleedCM1;
+uniform vec4 uBleedCM2;
+uniform vec4 uRimCM0;
+uniform vec4 uRimCM1;
+uniform vec4 uRimCM2;
+uniform vec4 uShadowParams;      // offsetX, offsetY, opacity, radius
+uniform vec4 uRimParams;         // widthPx, curvature, keyOpacity, fillOpacity
+uniform vec4 uOptics;            // bleedOpacity, bleedDarken, dispersion, blurScale
 uniform sampler2D uScene;
-uniform sampler2D uAmbient;
+
 out vec4 outColor;
 
-float sdRoundBox(vec2 p, vec2 halfSize, float radius) {
-  vec2 q = abs(p) - halfSize + vec2(radius);
-  return length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - radius;
+float sdSquircle(vec2 p, vec2 halfSize, float radius) {
+  float r = min(radius, min(halfSize.x, halfSize.y));
+  const float K = 1.5286649465560913;
+  float E = r * K;
+  vec2 ap = abs(p);
+  vec2 corner = halfSize - min(vec2(E), halfSize);
+  if (ap.x > corner.x && ap.y > corner.y && r > 0.5) {
+    vec2 wts = clamp(vec2(2.0 * 1.4457785) - (2.0 * halfSize * 1.4457785) / max(E, 1e-4), vec2(0.0), vec2(1.0));
+    vec2 qq = ap - halfSize + vec2(E + (r - E) * max(wts.x, wts.y));
+    vec2 v = max(vec2(0.0), (ap - halfSize + vec2(E)) / max(E, 1e-4));
+    float L = length(v);
+    float hi = max(v.x, v.y);
+    float t = clamp(hi > 0.0 ? min(v.x, v.y) / hi : 0.0, 0.0, 1.0);
+    float poly = (((-0.9260540008544922 * t + 3.1560099124908447) * t - 3.6412200927734375) * t + 1.268030047416687) * t + 0.2685309946537018;
+    float cont = L + 1.0 - 1.0 / (1.0 - t * t * clamp(L, 0.0, 1.0) * poly);
+    float circ = length(max(vec2(0.0), v * K - vec2(0.5286650061607361))) * 0.6541655659675598 + 0.3458344340324402;
+    float s = v.y > v.x ? 1.0 : -1.0;
+    float b = clamp(0.5 - s + s * t, 0.0, 1.0);
+    float c = cont + (circ - cont) * wts.x;
+    c = c + ((cont + (circ - cont) * wts.y) - c) * b;
+    return min(max(qq.x, qq.y), 0.0) + E * (c - 1.0);
+  }
+  vec2 q = ap - halfSize;
+  return max(q.x, q.y);
 }
+
 float panelSdf(vec2 p, vec4 rect, float radius) {
-  return sdRoundBox(p - (rect.xy + rect.zw * 0.5), rect.zw * 0.5, radius);
+  return sdSquircle(p - (rect.xy + rect.zw * 0.5), rect.zw * 0.5, radius);
 }
-float radiusAt(int index) {
-  if (index == 0) return uRadii.x;
-  if (index == 1) return uRadii.y;
-  if (index == 2) return uRadii.z;
-  return uRadii.w;
+
+float sphereProfile(float amount, float invHeight, float d) {
+  float t = clamp(-d * invHeight, 0.0, 1.0);
+  return amount * (1.0 - clamp(sqrt((2.0 - t) * t), 0.0, 1.0));
 }
-vec3 sceneAt(vec2 uv, vec2 offset) {
-  vec2 texel = 1.0 / vec2(textureSize(uScene, 0));
-  vec2 base = clamp(uv + offset, vec2(0.0), vec2(1.0));
-  vec3 c = texture(uScene, base).rgb * 0.44;
-  c += texture(uScene, clamp(base + vec2(texel.x * 1.4, 0.0), vec2(0.0), vec2(1.0))).rgb * 0.14;
-  c += texture(uScene, clamp(base - vec2(texel.x * 1.4, 0.0), vec2(0.0), vec2(1.0))).rgb * 0.14;
-  c += texture(uScene, clamp(base + vec2(0.0, texel.y * 1.4), vec2(0.0), vec2(1.0))).rgb * 0.14;
-  c += texture(uScene, clamp(base - vec2(0.0, texel.y * 1.4), vec2(0.0), vec2(1.0))).rgb * 0.14;
-  return c;
+
+float shadowCDF(float shiftedDistance, float invRadius) {
+  float x = clamp(0.25 * (invRadius * shiftedDistance) + 0.5, 0.0, 1.0);
+  x = 4.0 * x - 2.0;
+  float x2 = x * x;
+  float poly = 0.002954483 * x2 - 0.034454346;
+  poly = poly * x2 + 0.168212891;
+  poly = poly * x2 - 0.560546875;
+  return clamp(poly * x + 0.5, 0.0, 1.0);
 }
+
+float radiusLOD(float radius) {
+  float logIn = radius >= 2.0 ? radius : 1.0 + 0.5 * radius;
+  return clamp(log2(max(1.0, logIn)), 0.0, 4.5);
+}
+
+vec3 applyCM(vec3 rgb, vec4 r0, vec4 r1, vec4 r2) {
+  return vec3(
+    dot(rgb, r0.xyz) + r0.w,
+    dot(rgb, r1.xyz) + r1.w,
+    dot(rgb, r2.xyz) + r2.w
+  );
+}
+
+float keyFillBand(float depth, float width, float aa, float curvature) {
+  float t = clamp(depth / max(width, 1e-4), 0.0, 1.0);
+  float hard = t < 1.0 ? 1.0 : 0.0;
+  return mix(hard, 1.0 - t, curvature)
+    * clamp(depth / aa + 0.5, 0.0, 1.0)
+    * clamp((width - depth) / aa + 0.5, 0.0, 1.0);
+}
+
+vec3 sampleScene(vec2 uv, float lod) {
+  return textureLod(uScene, clamp(uv, vec2(0.001), vec2(0.999)), lod).rgb;
+}
+
 void main() {
+  vec2 res = uResMeta.xy;
+  int count = int(uResMeta.z + 0.5);
   vec2 uv = vec2(gl_FragCoord.x / uCanvas.x, 1.0 - gl_FragCoord.y / uCanvas.y);
-  vec2 p = uv * uCss;
+  vec2 p = uv * res;
+
   int chosen = -1;
   float chosenD = 1.0e9;
   vec4 chosenRect = vec4(0.0);
-  float chosenRadius = 22.0;
-  for (int i = 0; i < 4; i++) {
-    if (float(i) >= uCount) break;
+  float chosenRadius = 18.0;
+  float shadowAccum = 0.0;
+
+  for (int i = 0; i < 12; i++) {
+    if (i >= count) break;
     vec4 rect = uPanels[i];
     if (rect.z <= 0.0 || rect.w <= 0.0) continue;
-    float radius = radiusAt(i);
+    float radius = uRadii[i];
     float d = panelSdf(p, rect, radius);
-    if (d < 0.0 && d < chosenD) {
+    if (d < chosenD) {
       chosenD = d;
       chosen = i;
       chosenRect = rect;
       chosenRadius = radius;
     }
+    float D = min(rect.z, rect.w);
+    float sScale = clamp(D / 140.0, 0.45, 1.0);
+    float sRad = uShadowParams.w * sScale;
+    vec2 sOff = uShadowParams.xy * sScale;
+    if (d > -2.0 && d < sRad * 2.2) {
+      float sd = panelSdf(p - sOff, rect, radius);
+      float sFactor = shadowCDF(sd, 1.0 / max(sRad, 1.0)) * uShadowParams.z * mix(0.65, 1.0, sScale);
+      shadowAccum = max(shadowAccum, sFactor);
+    }
   }
+
   if (chosen < 0) discard;
+
   float d = chosenD;
-  vec4 rect = chosenRect;
-  float w = max(rect.z, 1.0);
-  float h = max(rect.w, 1.0);
-  float band = min(min(w, h) * 0.30, 104.0);
-  float t = clamp(-d / max(band, 1.0), 0.0, 1.0);
-  float lens = pow(1.0 - t, 2.0);
-  float amount = min(min(w, h) * 0.32, 112.0);
-  float e = 1.0;
-  float gx = panelSdf(p + vec2(e, 0.0), rect, chosenRadius) - panelSdf(p - vec2(e, 0.0), rect, chosenRadius);
-  float gy = panelSdf(p + vec2(0.0, e), rect, chosenRadius) - panelSdf(p - vec2(0.0, e), rect, chosenRadius);
-  vec2 normal = normalize(vec2(gx, gy) + vec2(0.0001));
-  float pulse = 1.0 + 0.18 * sin(uTime * 1.05 + p.y * 0.013);
-  vec2 offset = normal * (amount * lens * pulse) / uCss;
-  offset += vec2(-normal.y, normal.x) * (sin(uTime * 0.82 + t * 8.0) * 5.0) / uCss;
-  vec2 centerUv = (rect.xy + rect.zw * 0.5) / uCss;
-  vec2 sampleUv = centerUv + (uv - centerUv) * 0.90;
-  vec3 cr = sceneAt(sampleUv, offset * 1.00);
-  vec3 cg = sceneAt(sampleUv, offset * 1.12);
-  vec3 cb = sceneAt(sampleUv, offset * 1.24);
-  vec4 amb = vec4(0.0);
+  float aa = max(fwidth(d), 0.75);
+  float coverage = clamp(0.5 - d / aa, 0.0, 1.0);
 
-  vec3 color = vec3(cr.r, cg.g, cb.b);
-  color = color * (1.0 - amb.a) + amb.rgb;
-  vec2 local = p - rect.xy;
-  float faceT = clamp(local.x / w * 0.28 + local.y / h * 0.72, 0.0, 1.0);
-  vec4 face = mix(uFaceTop, uFaceBottom, faceT);
-  face.a *= 0.85 * smoothstep(0.0, 0.55, t);
-  color = color * (1.0 - face.a) + face.rgb * face.a;
-  float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
-  color = mix(vec3(luma), color, 1.16);
-  float edge = 1.0 - smoothstep(0.0, 2.0, -d);
-  float glow = smoothstep(0.0, 5.0, -d) * (1.0 - smoothstep(12.0, 26.0, -d));
-  color += vec3(1.0) * (1.0 - smoothstep(0.0, 1.2, -d)) * 0.12;
-  color *= 1.0 - uShade.a * smoothstep(0.0, 18.0, -d) * 0.10;
-  outColor = vec4(clamp(sceneAt(sampleUv, vec2(0.0)), vec3(0.0), vec3(1.0)), 1.0);
-}`;
+  if (coverage <= 0.001 && shadowAccum <= 0.002) discard;
 
-function parseColor(value) {
-  if (!value) return [1, 1, 1, 0];
-  const text = value.trim();
-  if (text.startsWith('#')) {
-    const hex = text.slice(1);
-    const n = hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex.slice(0, 6);
-    return [parseInt(n.slice(0, 2), 16) / 255, parseInt(n.slice(2, 4), 16) / 255, parseInt(n.slice(4, 6), 16) / 255, 1];
+  vec3 shadowTint = uResMeta.w > 0.5 ? vec3(0.05, 0.09, 0.15) : vec3(0.01, 0.02, 0.04);
+  vec4 shadowMat = vec4(shadowTint * shadowAccum, shadowAccum);
+
+  if (coverage <= 0.001) {
+    outColor = shadowMat;
+    return;
   }
-  const nums = text.match(/[\d.]+/g);
-  if (!nums || nums.length < 3) return [1, 1, 1, 0];
-  return [Number(nums[0]) / 255, Number(nums[1]) / 255, Number(nums[2]) / 255, nums.length > 3 ? Number(nums[3]) : 1];
-}
 
-function cssColor(style, name) {
-  return parseColor(style.getPropertyValue(name));
-}
+  vec4 rect = chosenRect;
+  float D = min(rect.z, rect.w);
+  float largeT = clamp((D - 44.0) / 116.0, 0.0, 1.0);
+
+  float eps = 0.75;
+  float gx = panelSdf(p + vec2(eps, 0.0), rect, chosenRadius) - panelSdf(p - vec2(eps, 0.0), rect, chosenRadius);
+  float gy = panelSdf(p + vec2(0.0, eps), rect, chosenRadius) - panelSdf(p - vec2(0.0, eps), rect, chosenRadius);
+  vec2 normal = normalize(vec2(gx, gy) + vec2(1e-5, 0.0));
+
+  float innerHeight = clamp(D * 0.24, 10.0, 22.0);
+  float innerAmount = -min(D * 0.60, 48.0);
+  float outerHeight = clamp(D * 0.12, 4.0, 13.0);
+  float outerAmount = min(D * 0.15, 13.0);
+
+  float innerDisp = sphereProfile(innerAmount, 1.0 / innerHeight, d);
+  float outerDisp = sphereProfile(outerAmount, 1.0 / outerHeight, d);
+
+  float baseBlur = mix(0.45, 1.35, largeT) * uOptics.w;
+  float rimClear = clamp(-d / max(innerHeight * 0.95, 1.0), 0.0, 1.0);
+  float innerLod = radiusLOD(baseBlur * smoothstep(0.0, 1.0, rimClear));
+  float outerLod = radiusLOD(baseBlur * 0.18);
+
+  float disp = uOptics.z;
+  vec2 innerVec = (normal * innerDisp) / res;
+  vec2 outerVec = (normal * outerDisp) / res;
+
+  float cr = sampleScene(uv + innerVec * (1.0 - disp), innerLod).r;
+  float cg = sampleScene(uv + innerVec, innerLod).g;
+  float cb = sampleScene(uv + innerVec * (1.0 + disp), innerLod).b;
+  vec3 refracted = vec3(cr, cg, cb);
+
+  vec3 outerSrc = sampleScene(uv + outerVec, outerLod);
+  float outerMix = clamp((d + 1.5) / 1.5, 0.0, 1.0) * 0.30;
+  refracted = mix(refracted, outerSrc, outerMix);
+
+  vec3 faceRGB = applyCM(refracted, uFaceCM0, uFaceCM1, uFaceCM2);
+
+  float bleedOpacity = uOptics.x * mix(0.25, 1.0, largeT);
+  if (bleedOpacity > 0.001) {
+    float bleedHeight = clamp(D * 0.35, 12.0, 52.0);
+    float bleedAmount = clamp(D * 0.35, 12.0, 48.0);
+    float bleedDisp = sphereProfile(bleedAmount, 1.0 / bleedHeight, d);
+    float bleedLod = radiusLOD(clamp(D * 0.22, 8.0, 28.0));
+    vec3 bleedSrc = sampleScene(uv + (normal * bleedDisp) / res, bleedLod);
+    vec3 bleedRGB = applyCM(bleedSrc, uBleedCM0, uBleedCM1, uBleedCM2);
+    float bleedRamp = 1.0 - clamp(-d / max(bleedHeight, 1.0), 0.0, 1.0);
+    float luma = clamp(dot(faceRGB, vec3(0.2125, 0.7154, 0.0721)), 0.0, 1.0);
+    float darken = uOptics.y > 0.5 ? luma : (1.0 - luma);
+    float w = darken * darken * bleedRamp;
+    faceRGB = mix(faceRGB, bleedRGB, clamp(w * w * bleedOpacity, 0.0, 0.65));
+  }
+
+  float holdW = 1.0 - clamp((-d - 1.0) / 2.0, 0.0, 1.0);
+  faceRGB = mix(faceRGB, faceRGB * (uResMeta.w > 0.5 ? 0.935 : 0.975), holdW * (uResMeta.w > 0.5 ? 0.50 : 0.35));
+
+  float depth = -d;
+  float rimW = uRimParams.x;
+  float curv = uRimParams.y;
+  vec2 keyDir = vec2(-0.70710678, -0.70710678);
+  vec2 fillDir = vec2(0.70710678, 0.70710678);
+
+  float band = keyFillBand(depth, rimW, aa, curv);
+  float keyAlign = clamp(dot(keyDir, normal), 0.0, 1.0);
+  float fillAlign = clamp(dot(fillDir, normal), 0.0, 1.0);
+
+  float grazing = 1.0 - max(keyAlign, fillAlign);
+  float contour = keyFillBand(depth, 1.05, aa, 0.5) * (uResMeta.w > 0.5 ? (0.10 + 0.08 * grazing) : 0.05);
+  faceRGB *= 1.0 - contour;
+
+  float keyMask = band * pow(keyAlign, 1.25) * uRimParams.z;
+  float fillMask = band * pow(fillAlign, 1.35) * uRimParams.w;
+  float hairline = keyFillBand(depth, 1.0, aa, 0.85) * (uResMeta.w > 0.5 ? 0.22 : 0.18);
+  float rimAlpha = clamp(keyMask + fillMask + hairline, 0.0, 1.0);
+
+  if (rimAlpha > 0.001) {
+    vec3 vibrantRim = clamp(applyCM(faceRGB, uRimCM0, uRimCM1, uRimCM2), vec3(0.0), vec3(1.2));
+    faceRGB = mix(faceRGB, clamp(vibrantRim, vec3(0.0), vec3(1.0)), rimAlpha);
+  }
+
+  float innerSheen = smoothstep(0.5, 2.5, depth) * (1.0 - smoothstep(3.0, 11.0, depth))
+    * pow(keyAlign, 1.6) * (uResMeta.w > 0.5 ? 0.05 : 0.07);
+  faceRGB = clamp(faceRGB + vec3(innerSheen), vec3(0.0), vec3(1.0));
+
+  vec4 faceMat = vec4(faceRGB, 1.0);
+  outColor = mix(shadowMat, faceMat, coverage);
+}`;
 
 function compile(gl, type, source) {
   const shader = gl.createShader(type);
@@ -138,16 +254,23 @@ function compile(gl, type, source) {
   return shader;
 }
 
-export async function createGlassGL({ canvas, sceneCanvas, ambientCanvas = null, panelSelectors = ['#controls', '#telemetry'] } = {}) {
+export async function createGlassGL({
+  canvas,
+  sceneCanvas,
+  ambientCanvas = null,
+  panelSelectors = DEFAULT_PANEL_SELECTORS,
+} = {}) {
   if (!canvas || !sceneCanvas) return null;
   let gl = null;
   try {
     gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
   } catch (_) {}
   if (!gl) return null;
+
   const vs = compile(gl, gl.VERTEX_SHADER, VERT);
   const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
   if (!vs || !fs) return null;
+
   const program = gl.createProgram();
   gl.attachShader(program, vs);
   gl.attachShader(program, fs);
@@ -159,63 +282,41 @@ export async function createGlassGL({ canvas, sceneCanvas, ambientCanvas = null,
   gl.useProgram(program);
 
   const U = {};
-  for (const name of ['uCss', 'uCanvas', 'uCount', 'uTime', 'uPanels', 'uRadii', 'uFaceTop', 'uFaceBottom', 'uRim', 'uBevel', 'uShade', 'uScene', 'uAmbient']) {
+  for (const name of [
+    'uResMeta', 'uCanvas', 'uPanels', 'uRadii',
+    'uFaceCM0', 'uFaceCM1', 'uFaceCM2',
+    'uBleedCM0', 'uBleedCM1', 'uBleedCM2',
+    'uRimCM0', 'uRimCM1', 'uRimCM2',
+    'uShadowParams', 'uRimParams', 'uOptics', 'uScene',
+  ]) {
     U[name] = gl.getUniformLocation(program, name);
   }
+
   const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  const ambientTexture = gl.createTexture();
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, ambientTexture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.uniform1i(U.uScene, 0);
-  gl.uniform1i(U.uAmbient, 1);
   gl.disable(gl.DEPTH_TEST);
   gl.disable(gl.BLEND);
 
   let panels = [];
-  let colors = null;
-  let ambientSource = ambientCanvas;
-  let ambientDirty = true;
-  let lastDraw = 0;
+  let themeParams = getThemeGlassParams(document.documentElement.dataset.theme || 'dark');
   let destroyed = false;
-
-  const readColors = () => {
-    const style = getComputedStyle(document.documentElement);
-    const faceTop = cssColor(style, '--glass-top');
-    const faceBottom = cssColor(style, '--glass-bottom');
-    const rim = cssColor(style, '--glass-topglow');
-    const bevel = cssColor(style, '--glass-bevel');
-    const shade = cssColor(style, '--glass-shade');
-    return {
-      faceTop, faceBottom,
-      rim: [rim[0], rim[1], rim[2], Math.min(1, rim[3] * 1.6)],
-      bevel: [bevel[0], bevel[1], bevel[2], Math.min(1, bevel[3] * 1.2)],
-      shade,
-    };
-  };
+  const rects = new Float32Array(MAX_PANELS * 4);
+  const radii = new Float32Array(MAX_PANELS);
 
   const updatePanels = () => {
-    panels = panelSelectors.map((selector) => document.querySelector(selector)).filter(Boolean).map((element) => {
-      const rect = element.getBoundingClientRect();
-      const radius = Number.parseFloat(getComputedStyle(element).borderTopLeftRadius) || 22;
-      return { x: rect.left, y: rect.top, w: rect.width, h: rect.height, radius };
-    }).filter((p) => p.w > 0 && p.h > 0);
+    panels = collectPanels(panelSelectors, MAX_PANELS);
   };
 
   const resize = () => {
-    const cssW = innerWidth || 1;
-    const cssH = innerHeight || 1;
-    const w = Math.max(1, Math.round(cssW * 0.6));
-    const h = Math.max(1, Math.round(cssH * 0.6));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(1, Math.round((innerWidth || 1) * dpr));
+    const h = Math.max(1, Math.round((innerHeight || 1) * dpr));
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
@@ -223,68 +324,73 @@ export async function createGlassGL({ canvas, sceneCanvas, ambientCanvas = null,
     gl.viewport(0, 0, w, h);
   };
 
-  const render = (now) => {
+  const render = () => {
     if (destroyed) return;
-    if (now - lastDraw < 1000 / 30) return;
-    lastDraw = now;
+    if (!sceneCanvas.width || !sceneCanvas.height) return;
     updatePanels();
-    if (!colors) colors = readColors();
     resize();
+
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     try {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sceneCanvas);
+      gl.generateMipmap(gl.TEXTURE_2D);
     } catch (error) {
       console.warn('[glass-gl] scene upload failed', error);
       return;
     }
-    if (ambientDirty && ambientSource) {
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, ambientTexture);
-      try {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, ambientSource);
-        ambientDirty = false;
-      } catch (error) {
-        console.warn('[glass-gl] ambient upload failed', error);
-      }
-      gl.activeTexture(gl.TEXTURE0);
-    }
+
     gl.useProgram(program);
-    gl.uniform2f(U.uCss, innerWidth || 1, innerHeight || 1);
+    gl.uniform4f(U.uResMeta, innerWidth || 1, innerHeight || 1, panels.length, themeParams.light);
     gl.uniform2f(U.uCanvas, canvas.width, canvas.height);
-    gl.uniform1f(U.uCount, panels.length);
-    gl.uniform1f(U.uTime, now / 1000);
-    const rects = new Float32Array(MAX_PANELS * 4);
-    const radii = new Float32Array(MAX_PANELS);
-    panels.forEach((panel, index) => {
-      rects.set([panel.x, panel.y, panel.w, panel.h], index * 4);
-      radii[index] = panel.radius;
-    });
+
+    rects.fill(0);
+    radii.fill(0);
+    for (let i = 0; i < panels.length; i++) {
+      const p = panels[i];
+      rects[i * 4] = p.x;
+      rects[i * 4 + 1] = p.y;
+      rects[i * 4 + 2] = p.w;
+      rects[i * 4 + 3] = p.h;
+      radii[i] = p.radius;
+    }
     gl.uniform4fv(U.uPanels, rects);
-    gl.uniform4fv(U.uRadii, radii);
-    gl.uniform4fv(U.uFaceTop, colors.faceTop);
-    gl.uniform4fv(U.uFaceBottom, colors.faceBottom);
-    gl.uniform4fv(U.uRim, colors.rim);
-    gl.uniform4fv(U.uBevel, colors.bevel);
-    gl.uniform4fv(U.uShade, colors.shade);
+    gl.uniform1fv(U.uRadii, radii);
+    gl.uniform4fv(U.uFaceCM0, themeParams.faceCM0);
+    gl.uniform4fv(U.uFaceCM1, themeParams.faceCM1);
+    gl.uniform4fv(U.uFaceCM2, themeParams.faceCM2);
+    gl.uniform4fv(U.uBleedCM0, themeParams.bleedCM0);
+    gl.uniform4fv(U.uBleedCM1, themeParams.bleedCM1);
+    gl.uniform4fv(U.uBleedCM2, themeParams.bleedCM2);
+    gl.uniform4fv(U.uRimCM0, themeParams.rimCM0);
+    gl.uniform4fv(U.uRimCM1, themeParams.rimCM1);
+    gl.uniform4fv(U.uRimCM2, themeParams.rimCM2);
+    gl.uniform4fv(U.uShadowParams, themeParams.shadow);
+    gl.uniform4fv(U.uRimParams, themeParams.rimParams);
+    gl.uniform4fv(U.uOptics, themeParams.optics);
+
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    gl.flush();
   };
 
   const onResize = () => { resize(); updatePanels(); };
-  const onTheme = () => { colors = readColors(); };
+  const onTheme = () => {
+    themeParams = getThemeGlassParams(document.documentElement.dataset.theme || 'dark');
+    updatePanels();
+  };
+
   const observer = new ResizeObserver(() => updatePanels());
-  document.querySelectorAll(panelSelectors.join(',')).forEach((element) => observer.observe(element));
+  for (const selector of panelSelectors) {
+    document.querySelectorAll(selector).forEach((el) => observer.observe(el));
+  }
   addEventListener('resize', onResize);
   document.addEventListener('themechange', onTheme);
   resize();
   updatePanels();
-  colors = readColors();
   document.body.classList.add('glass-gpu');
-  window.__glassGL = { get active() { return !destroyed; }, get panels() { return panels.length; }, destroy };
+  window.__glassGL = { get active() { return !destroyed; }, get panels() { return panels.length; }, render, destroy };
 
   function destroy() {
     if (destroyed) return;
@@ -297,7 +403,6 @@ export async function createGlassGL({ canvas, sceneCanvas, ambientCanvas = null,
     gl.deleteProgram(program);
   }
 
-  const setAmbient = (canvasSource) => { ambientSource = canvasSource; ambientDirty = true; };
-
+  const setAmbient = () => {};
   return { render, destroy, setAmbient, get active() { return !destroyed; }, get backend() { return 'webgl2'; } };
 }

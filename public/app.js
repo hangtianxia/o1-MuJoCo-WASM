@@ -1113,9 +1113,9 @@ const SCENE_THEMES = {
     steelMetalness: 0.55, steelRoughness: 0.42,
   },
   light: {
-    clear: 0xe8edf4, fog: 0xe8edf4, gridMajor: 0xc3cedb, gridMinor: 0xd8e2ec,
+    clear: 0xe8edf4, fog: 0xe8edf4, gridMajor: 0x9aaec4, gridMinor: 0xc5d2e0,
     sky: 0xe3edfc, ground: 0x78889c, hemiIntensity: 1.15, keyIntensity: 2.0,
-    fill: 0xc2cedc, steel: 0xa9b7c7, edge: 0x74879d, edgeOpacity: 0.55,
+    fill: 0xb6c5d6, steel: 0xa1b1c2, edge: 0x5d728a, edgeOpacity: 0.65,
     steelMetalness: 0.2, steelRoughness: 0.55,
   },
 };
@@ -1169,7 +1169,7 @@ async function initThree() {
   } catch (_) {}
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0b0e13, 14, 34);
+  scene.fog = new THREE.Fog(0x0b0e13, 18, 42);
 
   camera = new THREE.PerspectiveCamera(46, host.clientWidth / host.clientHeight, 0.05, 120);
   camera.up.set(0, 0, 1);
@@ -2619,7 +2619,6 @@ async function runCheck({ steps = 250, command = null } = {}) {
           canvas: fresh,
           sceneCanvas: renderer.domElement,
           ambientCanvas: state.ambient?.canvas,
-          panelSelectors: ['#controls', '#telemetry'],
         });
         if (state.glass) console.log('webgl2 glass active');
       };
@@ -2630,7 +2629,6 @@ async function runCheck({ steps = 250, command = null } = {}) {
             canvas: document.getElementById('glass-gpu'),
             sceneCanvas: renderer.domElement,
             ambientCanvas: state.ambient?.canvas,
-            panelSelectors: ['#controls', '#telemetry'],
             onLost: () => { setBadge('glass · css', 'css'); startGL().catch((error) => console.warn('WebGL glass fallback failed', error)); },
           });
         }
